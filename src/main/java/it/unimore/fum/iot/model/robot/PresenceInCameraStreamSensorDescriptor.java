@@ -38,7 +38,8 @@ public class PresenceInCameraStreamSensorDescriptor {
 
     public void checkPresenceInCameraStream(){
         // managing value
-        this.value = this.random.nextBoolean();
+        int num = this.random.nextInt(10);
+        this.value = num == 9;
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
