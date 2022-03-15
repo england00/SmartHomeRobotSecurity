@@ -1,13 +1,13 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.presence;
 
 import java.util.Random;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 15/03/2022 - 01:44
+ * @created 15/03/2022 - 12:51
  */
-public class PresenceInCameraStreamSensorDescriptor {
+public class PassiveInfraRedSensorDescriptor {
 
     // sensor's parameters
     private long timestamp;
@@ -16,7 +16,7 @@ public class PresenceInCameraStreamSensorDescriptor {
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
 
-    public PresenceInCameraStreamSensorDescriptor() {
+    public PassiveInfraRedSensorDescriptor() {
         this.random = new Random();
     }
 
@@ -36,7 +36,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.value = value;
     }
 
-    public void checkPresenceInCameraStream(){
+    public void checkPassiveInfraRedSensorDescriptor(){
         // managing value
         int num = this.random.nextInt(10);
         this.value = num == 9; // if num == 9, return true, else is always false
@@ -49,7 +49,9 @@ public class PresenceInCameraStreamSensorDescriptor {
     public String toString() {
         final StringBuffer sb = new StringBuffer("PresenceInCameraStreamSensorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", value=").append(value);
+        if (this.value) {
+            sb.append(", value=").append(value);
+        }
         sb.append('}');
         return sb.toString();
     }

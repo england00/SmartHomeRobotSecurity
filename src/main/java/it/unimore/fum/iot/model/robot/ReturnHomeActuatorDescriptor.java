@@ -9,18 +9,13 @@ public class ReturnHomeActuatorDescriptor {
 
     // actuator's parameters
     private long timestamp;
-    private double xChargerPosition;
-    private double yChargerPosition;
-
-    //external values
-
+    private double[] ChargerPosition = new double[2];
 
     public ReturnHomeActuatorDescriptor() {
     }
 
-    public ReturnHomeActuatorDescriptor(double xChargerPosition, double yChargerPosition) {
-        this.xChargerPosition = xChargerPosition;
-        this.yChargerPosition = yChargerPosition;
+    public ReturnHomeActuatorDescriptor(double[] ChargerPosition) {
+        this.ChargerPosition = ChargerPosition;
     }
 
     public long getTimestamp() {
@@ -31,28 +26,20 @@ public class ReturnHomeActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
-    public double getxChargerPosition() {
-        return xChargerPosition;
+    public double[] getChargerPosition() {
+        return ChargerPosition;
     }
 
-    public void setxChargerPosition(double xChargerPosition) {
-        this.xChargerPosition = xChargerPosition;
-    }
-
-    public double getyChargerPosition() {
-        return yChargerPosition;
-    }
-
-    public void setyChargerPosition(double yChargerPosition) {
-        this.yChargerPosition = yChargerPosition;
+    public void setChargerPosition(double[] ChargerPosition) {
+        this.ChargerPosition = ChargerPosition;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("IndoorPositionSensorDescriptor{");
+        final StringBuffer sb = new StringBuffer("ReturnHomeActuatorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", xChargerPosition=").append(xChargerPosition);
-        sb.append(", yChargerPosition='").append(yChargerPosition).append('\'');
+        sb.append(", xChargerPosition=").append(ChargerPosition[0]);
+        sb.append(", yChargerPosition='").append(ChargerPosition[1]).append('\'');
         sb.append('}');
         return sb.toString();
     }
