@@ -1,7 +1,6 @@
-package it.unimore.fum.iot.test;
+package it.unimore.fum.iot.test.robot;
 
-import it.unimore.fum.iot.model.sensors.BatteryLevelSensorDescriptor;
-import it.unimore.fum.iot.model.sensors.IndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.model.robot.BatteryLevelSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -21,7 +20,7 @@ public class BatteryLevelSensorDescriptorTester {
         for (control = 0; control < 1000; control++) {
 
             batteryLevelSensorDescriptor.checkBatteryLevel();
-            System.out.println(batteryLevelSensorDescriptor.toString());
+            System.out.println(batteryLevelSensorDescriptor);
 
             try {
                 Thread.sleep(2000);

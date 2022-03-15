@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.test;
+package it.unimore.fum.iot.test.robot;
 
-import it.unimore.fum.iot.model.sensors.IndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.model.robot.IndoorPositionSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -20,7 +20,7 @@ public class IndoorPositionSensorDescriptorTester {
         for (control = 0; control < 1000; control++) {
 
             indoorPositionSensorDescriptor.updateIndoorPosition();
-            System.out.println(indoorPositionSensorDescriptor.toString());
+            System.out.println(indoorPositionSensorDescriptor);
 
             try {
                 Thread.sleep(2000);

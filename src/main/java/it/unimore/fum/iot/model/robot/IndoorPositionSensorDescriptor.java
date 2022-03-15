@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model.sensors;
+package it.unimore.fum.iot.model.robot;
 
 import java.util.Random;
 
