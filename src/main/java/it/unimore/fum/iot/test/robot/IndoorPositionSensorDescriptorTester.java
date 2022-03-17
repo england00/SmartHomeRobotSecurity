@@ -14,7 +14,7 @@ public class IndoorPositionSensorDescriptorTester {
         System.out.println("Testing Indoor Position Sensor ...");
 
         // requesting position
-        IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(3, 4);
+        IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0, 0.0});
 
         int control;
         for (control = 0; control < 1000; control++) {

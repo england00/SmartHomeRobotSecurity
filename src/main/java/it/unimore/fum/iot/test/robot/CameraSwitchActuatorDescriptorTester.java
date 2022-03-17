@@ -13,16 +13,16 @@ public class CameraSwitchActuatorDescriptorTester {
 
         System.out.println("Testing Camera Switch Actuator ...");
 
-        // requesting battery level
+        // requesting
         CameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor();
 
         int control;
         for (control = 0; control < 1000; control++) {
 
-            if (cameraSwitchActuatorDescriptor.isStatus()) {
-                cameraSwitchActuatorDescriptor.changeSwitchStatusOff();
+            if (cameraSwitchActuatorDescriptor.isValue()) {
+                cameraSwitchActuatorDescriptor.switchStatusOff();
             } else
-                cameraSwitchActuatorDescriptor.changeSwitchStatusOn();
+                cameraSwitchActuatorDescriptor.switchStatusOn();
             System.out.println(cameraSwitchActuatorDescriptor);
 
             try {
@@ -33,4 +33,3 @@ public class CameraSwitchActuatorDescriptorTester {
         }
     }
 }
-

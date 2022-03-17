@@ -9,12 +9,12 @@ public class ModeActuatorDescriptor {
 
     // actuator's parameters
     private long timestamp;
-    private String mode;
+    private String value;
 
     public ModeActuatorDescriptor() {}
 
-    public ModeActuatorDescriptor(String mode) {
-        this.mode = mode;
+    public ModeActuatorDescriptor(String value) {
+        this.value = value;
     }
 
     public long getTimestamp() {
@@ -25,17 +25,17 @@ public class ModeActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
-    public String getMode() {
-        return mode;
+    public String getValue() {
+        return value;
     }
 
-    public void setMode(String mode) {
-        this.mode = mode;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public void modeStart(){
         // managing mode
-        this.mode = "START";
+        this.value = "START";
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -43,7 +43,7 @@ public class ModeActuatorDescriptor {
 
     public void modePause(){
         // managing mode
-        this.mode = "PAUSE";
+        this.value = "PAUSE";
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -51,7 +51,7 @@ public class ModeActuatorDescriptor {
 
     public void modeStop(){
         // managing mode
-        this.mode = "STOP";
+        this.value = "STOP";
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -61,7 +61,7 @@ public class ModeActuatorDescriptor {
     public String toString() {
         final StringBuffer sb = new StringBuffer("ModeActuatorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", mode").append(mode);
+        sb.append(", value='").append(value).append('\'');
         sb.append('}');
         return sb.toString();
     }

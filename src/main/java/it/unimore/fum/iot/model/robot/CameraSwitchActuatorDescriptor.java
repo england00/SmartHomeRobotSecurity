@@ -11,12 +11,12 @@ public class CameraSwitchActuatorDescriptor {
 
     // actuator's parameters
     private long timestamp;
-    private boolean status;
+    private boolean value;
 
     public CameraSwitchActuatorDescriptor() {}
 
-    public CameraSwitchActuatorDescriptor(boolean status) {
-        this.status = status;
+    public CameraSwitchActuatorDescriptor(boolean value) {
+        this.value = value;
     }
 
     public long getTimestamp() {
@@ -27,25 +27,25 @@ public class CameraSwitchActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
-    public boolean isStatus() {
-        return status;
+    public boolean isValue() {
+        return value;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setValue(boolean value) {
+        this.value = value;
     }
 
-    public void changeSwitchStatusOn(){
+    public void switchStatusOn(){
         // managing status
-        this.status = true;
+        this.value = true;
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
     }
 
-    public void changeSwitchStatusOff(){
+    public void switchStatusOff(){
         // managing status
-        this.status = false;
+        this.value = false;
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -55,7 +55,7 @@ public class CameraSwitchActuatorDescriptor {
     public String toString() {
         final StringBuffer sb = new StringBuffer("CameraSwitchActuatorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", status=").append(status);
+        sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();
     }

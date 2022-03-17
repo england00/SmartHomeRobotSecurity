@@ -1,5 +1,7 @@
 package it.unimore.fum.iot.model.robot;
 
+import java.util.Arrays;
+
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
@@ -9,13 +11,14 @@ public class ReturnHomeActuatorDescriptor {
 
     // actuator's parameters
     private long timestamp;
-    private double[] ChargerPosition = new double[2];
+    private boolean value;
+    private double[] chargerPosition = new double[3];
 
     public ReturnHomeActuatorDescriptor() {
     }
 
-    public ReturnHomeActuatorDescriptor(double[] ChargerPosition) {
-        this.ChargerPosition = ChargerPosition;
+    public ReturnHomeActuatorDescriptor(double[] chargerPosition) {
+        this.chargerPosition = chargerPosition;
     }
 
     public long getTimestamp() {
@@ -26,20 +29,44 @@ public class ReturnHomeActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
-    public double[] getChargerPosition() {
-        return ChargerPosition;
+    public boolean isValue() {
+        return value;
     }
 
-    public void setChargerPosition(double[] ChargerPosition) {
-        this.ChargerPosition = ChargerPosition;
+    public void setValue(boolean value) {
+        this.value = value;
+    }
+
+    public double[] getChargerPosition() {
+        return chargerPosition;
+    }
+
+    public void setChargerPosition(double[] chargerPosition) {
+        this.chargerPosition = chargerPosition;
+    }
+
+    public void switchReturnOn(){
+        // managing status
+        this.value = true;
+
+        // managing timestamp
+        this.timestamp = System.currentTimeMillis();
+    }
+
+    public void switchReturnOff(){
+        // managing status
+        this.value = false;
+
+        // managing timestamp
+        this.timestamp = System.currentTimeMillis();
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ReturnHomeActuatorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", xChargerPosition=").append(ChargerPosition[0]);
-        sb.append(", yChargerPosition='").append(ChargerPosition[1]).append('\'');
+        sb.append(" value=").append(value);
+        sb.append(", chargerPosition=").append(Arrays.toString(chargerPosition));
         sb.append('}');
         return sb.toString();
     }

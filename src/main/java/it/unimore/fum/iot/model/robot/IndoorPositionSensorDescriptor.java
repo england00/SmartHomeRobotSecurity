@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.model.robot;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -11,20 +12,19 @@ public class IndoorPositionSensorDescriptor {
 
     // sensor's parameters
     private long timestamp;
-    private double x = 0;
-    private double y = 0;
+    private double[] position = new double[3]; // 3 values array
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
-    private final double xRoomDimension;
-    private final double yRoomDimension;
+    private final double[] roomDimensions; // 3 values array
+    private double[] chargerPosition = new double[3]; // 3 values array
     private int direction = 1;
+    private static final double SPEED = 0.0002;
     private long timer = System.currentTimeMillis();
 
-    public IndoorPositionSensorDescriptor(double xRoomDimension, double yRoomDimension) {
+    public IndoorPositionSensorDescriptor(double[] roomDimensions) {
         this.random = new Random();
-        this.xRoomDimension = xRoomDimension;
-        this.yRoomDimension = yRoomDimension;
+        this.roomDimensions = roomDimensions;
     }
 
     public long getTimestamp() {
@@ -35,20 +35,12 @@ public class IndoorPositionSensorDescriptor {
         this.timestamp = timestamp;
     }
 
-    public double getX() {
-        return x;
+    public double[] getPosition() {
+        return position;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
+    public void setPosition(double[] position) {
+        this.position = position;
     }
 
     public Random getRandom() {
@@ -66,86 +58,88 @@ public class IndoorPositionSensorDescriptor {
          */
 
         // distance traveled during time
-        double distance = (0.0002 * (System.currentTimeMillis() - this.timer));
+        double distance = (SPEED * (System.currentTimeMillis() - this.timer));
 
         // simulating robot's moves inside the dimensions of the room
         if (direction == 1) {
             // from up-right
-            if (((this.x + distance) < this.xRoomDimension) && ((this.y + distance) < this.yRoomDimension)) {
-                this.x += distance;
-                this.y += distance; // continue
-            } else if (((this.x + distance) < this.xRoomDimension) && ((this.y + distance) > this.yRoomDimension)) {
-                this.x += distance;
-                this.y -= distance;
+            if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] + distance) < this.roomDimensions[1])) {
+                this.position[0] += distance;
+                this.position[1] += distance; // continue
+            } else if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] + distance) > this.roomDimensions[1])) {
+                this.position[0] += distance;
+                this.position[1] -= distance;
                 direction = 2; // to down-right
-            } else if (((this.x + distance) > this.xRoomDimension) && ((this.y + distance) < this.yRoomDimension)) {
-                this.x -= distance;
-                this.y += distance;
+            } else if (((this.position[0] + distance) > this.roomDimensions[0]) && ((this.position[1] + distance) < this.roomDimensions[1])) {
+                this.position[0] -= distance;
+                this.position[1] += distance;
                 direction = 4; // to up-left
             } else {
-                this.x -= distance;
-                this.y -= distance;
+                this.position[0] -= distance;
+                this.position[1] -= distance;
                 direction = 3; // to down-left
             }
 
         } else if (direction == 2) {
             // from down-right
-            if (((this.x + distance) < this.xRoomDimension) && ((this.y - distance) > 0)) {
-                this.x += distance;
-                this.y -= distance; // continue
-            } else if (((this.x + distance) < this.xRoomDimension) && ((this.y - distance) < 0)) {
-                this.x += distance;
-                this.y += distance;
+            if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] - distance) > 0)) {
+                this.position[0] += distance;
+                this.position[1] -= distance; // continue
+            } else if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] - distance) < 0)) {
+                this.position[0] += distance;
+                this.position[1] += distance;
                 direction = 1; // to up-right
-            } else if (((this.x + distance) > this.xRoomDimension) && ((this.y - distance) > 0)) {
-                this.x -= distance;
-                this.y -= distance;
+            } else if (((this.position[0] + distance) > this.roomDimensions[0]) && ((this.position[1] - distance) > 0)) {
+                this.position[0] -= distance;
+                this.position[1] -= distance;
                 direction = 3; // to down-left
             } else {
-                this.x -= distance;
-                this.y += distance;
+                this.position[0] -= distance;
+                this.position[1] += distance;
                 direction = 4; // to up-left
             }
 
         } else if (direction == 3) {
             // from down-left
-            if (((this.x - distance) > 0) && ((this.y - distance) > 0)) {
-                this.x -= distance;
-                this.y -= distance; // continue
-            } else if (((this.x - distance) > 0) && ((this.y - distance) < 0)) {
-                this.x -= distance;
-                this.y += distance;
+            if (((this.position[0] - distance) > 0) && ((this.position[1] - distance) > 0)) {
+                this.position[0] -= distance;
+                this.position[1] -= distance; // continue
+            } else if (((this.position[0] - distance) > 0) && ((this.position[1] - distance) < 0)) {
+                this.position[0] -= distance;
+                this.position[1] += distance;
                 direction = 4; // to up-left
-            } else if (((this.x - distance) < 0) && ((this.y - distance) > 0)) {
-                this.x += distance;
-                this.y -= distance;
+            } else if (((this.position[0] - distance) < 0) && ((this.position[1] - distance) > 0)) {
+                this.position[0] += distance;
+                this.position[1] -= distance;
                 direction = 2; // to down-right
             } else {
-                this.x += distance;
-                this.y += distance;
+                this.position[0] += distance;
+                this.position[1] += distance;
                 direction = 1; // to up-right
             }
 
         } else {
             // from up-left
-            if (((this.x - distance) > 0) && ((this.y + distance) < this.yRoomDimension)) {
-                this.x -= distance;
-                this.y += distance; // continue
-            } else if (((this.x - distance) > 0) && ((this.y + distance) > this.yRoomDimension)) {
-                this.x -= distance;
-                this.y -= distance;
+            if (((this.position[0] - distance) > 0) && ((this.position[1] + distance) < this.roomDimensions[1])) {
+                this.position[0] -= distance;
+                this.position[1] += distance; // continue
+            } else if (((this.position[0] - distance) > 0) && ((this.position[1] + distance) > this.roomDimensions[1])) {
+                this.position[0] -= distance;
+                this.position[1] -= distance;
                 direction = 3; // to up-left
-            } else if (((this.x - 3) < 0) && ((this.y + 3) < this.yRoomDimension)) {
-                this.x += distance;
-                this.y += distance;
+            } else if (((this.position[0] - 3) < 0) && ((this.position[1] + 3) < this.roomDimensions[1])) {
+                this.position[0] += distance;
+                this.position[1] += distance;
                 direction = 1; // to up-right
             } else {
-                this.x += distance;
-                this.y -= distance;
+                this.position[0] += distance;
+                this.position[1] -= distance;
                 direction = 2; // to down-right
             }
 
         }
+
+        this.position[2] = this.roomDimensions[2];
 
         // updating time
         this.timer = System.currentTimeMillis();
@@ -154,12 +148,24 @@ public class IndoorPositionSensorDescriptor {
         this.timestamp = System.currentTimeMillis();
     }
 
+    public void updateReturningHomePosition(double[] chargerPosition) {
+        this.chargerPosition = chargerPosition;
+
+        // angular coefficient
+        double m = (this.position[1] - this.chargerPosition[1]) / (this.position[0] - this.chargerPosition[0]);
+
+        // distance traveled during time
+        double distance = (0.0002 * (System.currentTimeMillis() - this.timer));
+
+
+
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("IndoorPositionSensorDescriptor{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", x=").append(x);
-        sb.append(", y='").append(y).append('\'');
+        sb.append(", position=").append(Arrays.toString(position));
         sb.append('}');
         return sb.toString();
     }

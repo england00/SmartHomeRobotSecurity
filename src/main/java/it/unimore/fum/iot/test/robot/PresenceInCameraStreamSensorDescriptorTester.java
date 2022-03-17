@@ -13,7 +13,7 @@ public class PresenceInCameraStreamSensorDescriptorTester {
 
         System.out.println("Testing Presence In Camera Stream Sensor ...");
 
-        // requesting battery level
+        // requesting
         PresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor = new PresenceInCameraStreamSensorDescriptor();
 
         int control;

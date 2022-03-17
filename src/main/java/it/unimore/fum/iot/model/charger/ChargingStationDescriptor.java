@@ -12,7 +12,7 @@ public class ChargingStationDescriptor {
     // device's parameters
     private String chargerId;
     private String room;
-    private double[] position = new double[2];
+    private double[] position = new double[3];
     private String softwareVersion;
     private String manufacturer;
 
@@ -68,10 +68,10 @@ public class ChargingStationDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("RobotDescriptor{");
+        final StringBuffer sb = new StringBuffer("ChargingStationDescriptor{");
         sb.append("chargerId='").append(chargerId).append('\'');
         sb.append(", room='").append(room).append('\'');
-        sb.append(", position='").append(Arrays.toString(position)).append('\'');
+        sb.append(", position=").append(Arrays.toString(position));
         sb.append(", manufacturer='").append(manufacturer).append('\'');
         sb.append(", softwareVersion='").append(softwareVersion).append('\'');
         sb.append('}');
