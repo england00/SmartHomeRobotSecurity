@@ -12,12 +12,12 @@ public class IndoorPositionSensorDescriptor {
 
     // sensor's parameters
     private long timestamp;
-    private double[] position = new double[3]; // 3 values array
+    private double[] position = new double[2]; // 2 values array
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
-    private final double[] roomDimensions; // 3 values array
-    private double[] chargerPosition = new double[3]; // 3 values array
+    private final double[] roomDimensions; // 2 values array
+    private double[] chargerPosition = new double[3]; // 2 values array
     private int direction = 1;
     private static final double SPEED = 0.0002;
     private long timer = System.currentTimeMillis();
@@ -49,18 +49,58 @@ public class IndoorPositionSensorDescriptor {
 
     public void updateIndoorPosition(){
 
+
         /*
          * 'direction' values:
+         * 0 => up
          * 1 => up-right
-         * 2 => down-right
-         * 3 => down-left
-         * 4 => up-left
+         * 2 => right
+         * 3 => down-right
+         * 4 => down
+         * 5 => down-left
+         * 6 => left
+         * 7 => up-left
          */
+        //this.direction = this.random.nextInt(8);
 
-        // distance traveled during time
+        // max distance traveled during time
         double distance = (SPEED * (System.currentTimeMillis() - this.timer));
+        if (distance == 0.0) {
+            distance = 1.0;
+        }
 
         // simulating robot's moves inside the dimensions of the room
+
+        // obtaining x
+        boolean sign;
+        boolean control = false;
+
+        // obtaining x
+        while (!control) {
+            sign = this.random.nextBoolean();
+            if (!sign) {
+                this.position[0] -= this.random.nextDouble(distance);
+            } else {
+                this.position[0] += this.random.nextDouble(distance);
+            }
+            if (this.position[0] < this.roomDimensions[0] && this.position[0] > 0)
+                control = true;
+        }
+
+        // obtaining y
+        while (control) {
+            sign = this.random.nextBoolean();
+            if (!sign) {
+                this.position[1] -= this.random.nextDouble(distance);
+            } else {
+                this.position[1] += this.random.nextDouble(distance);
+            }
+            if (this.position[1] < this.roomDimensions[1] && this.position[1] > 0)
+                control = false;
+        }
+
+        /*
+
         if (direction == 1) {
             // from up-right
             if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] + distance) < this.roomDimensions[1])) {
@@ -141,6 +181,8 @@ public class IndoorPositionSensorDescriptor {
 
         this.position[2] = this.roomDimensions[2];
 
+
+         */
         // updating time
         this.timer = System.currentTimeMillis();
 
