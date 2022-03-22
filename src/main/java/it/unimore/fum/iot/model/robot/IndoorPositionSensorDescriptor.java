@@ -11,16 +11,15 @@ import java.util.Random;
 public class IndoorPositionSensorDescriptor {
 
     // sensor's parameters
-    private long timestamp;
+    private long timestamp = System.currentTimeMillis();
     private double[] position = new double[2]; // 2 values array
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
     private final double[] roomDimensions; // 2 values array
-    private double[] chargerPosition = new double[3]; // 2 values array
-    private int direction = 1;
-    private static final double SPEED = 0.0002;
-    private long timer = System.currentTimeMillis();
+    private static final double SPEED = 0.0005; // 50 cm/s
+    private double[] chargerPosition;
+    private boolean returnFlag = false;
 
     public IndoorPositionSensorDescriptor(double[] roomDimensions) {
         this.random = new Random();
@@ -47,144 +46,69 @@ public class IndoorPositionSensorDescriptor {
         return random;
     }
 
-    public void updateIndoorPosition(){
+    public void updateIndoorPosition() {
 
+        if (!this.returnFlag) {
 
-        /*
-         * 'direction' values:
-         * 0 => up
-         * 1 => up-right
-         * 2 => right
-         * 3 => down-right
-         * 4 => down
-         * 5 => down-left
-         * 6 => left
-         * 7 => up-left
-         */
-        //this.direction = this.random.nextInt(8);
-
-        // max distance traveled during time
-        double distance = (SPEED * (System.currentTimeMillis() - this.timer));
-        if (distance == 0.0) {
-            distance = 1.0;
-        }
-
-        // simulating robot's moves inside the dimensions of the room
-
-        // obtaining x
-        boolean sign;
-        boolean control = false;
-
-        // obtaining x
-        while (!control) {
-            sign = this.random.nextBoolean();
-            if (!sign) {
-                this.position[0] -= this.random.nextDouble(distance);
-            } else {
-                this.position[0] += this.random.nextDouble(distance);
-            }
-            if (this.position[0] < this.roomDimensions[0] && this.position[0] > 0)
-                control = true;
-        }
-
-        // obtaining y
-        while (control) {
-            sign = this.random.nextBoolean();
-            if (!sign) {
-                this.position[1] -= this.random.nextDouble(distance);
-            } else {
-                this.position[1] += this.random.nextDouble(distance);
-            }
-            if (this.position[1] < this.roomDimensions[1] && this.position[1] > 0)
-                control = false;
-        }
-
-        /*
-
-        if (direction == 1) {
-            // from up-right
-            if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] + distance) < this.roomDimensions[1])) {
-                this.position[0] += distance;
-                this.position[1] += distance; // continue
-            } else if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] + distance) > this.roomDimensions[1])) {
-                this.position[0] += distance;
-                this.position[1] -= distance;
-                direction = 2; // to down-right
-            } else if (((this.position[0] + distance) > this.roomDimensions[0]) && ((this.position[1] + distance) < this.roomDimensions[1])) {
-                this.position[0] -= distance;
-                this.position[1] += distance;
-                direction = 4; // to up-left
-            } else {
-                this.position[0] -= distance;
-                this.position[1] -= distance;
-                direction = 3; // to down-left
+            // max distance traveled during time
+            double distance = (SPEED * (System.currentTimeMillis() - this.timestamp));
+            if (distance == 0.0) {
+                distance = 1.0;
             }
 
-        } else if (direction == 2) {
-            // from down-right
-            if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] - distance) > 0)) {
-                this.position[0] += distance;
-                this.position[1] -= distance; // continue
-            } else if (((this.position[0] + distance) < this.roomDimensions[0]) && ((this.position[1] - distance) < 0)) {
-                this.position[0] += distance;
-                this.position[1] += distance;
-                direction = 1; // to up-right
-            } else if (((this.position[0] + distance) > this.roomDimensions[0]) && ((this.position[1] - distance) > 0)) {
-                this.position[0] -= distance;
-                this.position[1] -= distance;
-                direction = 3; // to down-left
-            } else {
-                this.position[0] -= distance;
-                this.position[1] += distance;
-                direction = 4; // to up-left
+            // simulating normal robot's moves inside the dimensions of the room
+            boolean sign;
+            boolean control = false;
+
+            // obtaining x
+            while (!control) {
+                sign = this.random.nextBoolean();
+                if (!sign) {
+                    this.position[0] -= this.random.nextDouble(distance);
+                } else {
+                    this.position[0] += this.random.nextDouble(distance);
+                }
+                if (this.position[0] < this.roomDimensions[0] && this.position[0] > 0) {
+                    control = true;
+                }
             }
 
-        } else if (direction == 3) {
-            // from down-left
-            if (((this.position[0] - distance) > 0) && ((this.position[1] - distance) > 0)) {
-                this.position[0] -= distance;
-                this.position[1] -= distance; // continue
-            } else if (((this.position[0] - distance) > 0) && ((this.position[1] - distance) < 0)) {
-                this.position[0] -= distance;
-                this.position[1] += distance;
-                direction = 4; // to up-left
-            } else if (((this.position[0] - distance) < 0) && ((this.position[1] - distance) > 0)) {
-                this.position[0] += distance;
-                this.position[1] -= distance;
-                direction = 2; // to down-right
-            } else {
-                this.position[0] += distance;
-                this.position[1] += distance;
-                direction = 1; // to up-right
+            // obtaining y
+            while (control) {
+                sign = this.random.nextBoolean();
+                if (!sign) {
+                    this.position[1] -= this.random.nextDouble(distance);
+                } else {
+                    this.position[1] += this.random.nextDouble(distance);
+                }
+                if (this.position[1] < this.roomDimensions[1] && this.position[1] > 0) {
+                    control = false;
+                }
             }
 
         } else {
-            // from up-left
-            if (((this.position[0] - distance) > 0) && ((this.position[1] + distance) < this.roomDimensions[1])) {
-                this.position[0] -= distance;
-                this.position[1] += distance; // continue
-            } else if (((this.position[0] - distance) > 0) && ((this.position[1] + distance) > this.roomDimensions[1])) {
-                this.position[0] -= distance;
-                this.position[1] -= distance;
-                direction = 3; // to up-left
-            } else if (((this.position[0] - 3) < 0) && ((this.position[1] + 3) < this.roomDimensions[1])) {
-                this.position[0] += distance;
-                this.position[1] += distance;
-                direction = 1; // to up-right
+
+            // simulating robot's returning home moves inside the dimensions of the room
+            // angular coefficient and q
+            double m = (this.position[1] - chargerPosition[1]) / (this.position[0] - chargerPosition[0]);
+            double q = (this.chargerPosition[1] - m * this.chargerPosition[0]);
+
+            // effective distance from destination
+            double dDestination = Math.pow((Math.pow((this.position[1] - chargerPosition[1]), 2) +
+                    Math.pow((this.position[0] - chargerPosition[0]), 2)), 0.5);
+
+            if (dDestination > 0.001) {
+                if (this.position[0] > this.chargerPosition[0]) {
+                    this.position[0] -= this.random.nextDouble(this.position[0] - this.chargerPosition[0]);
+                } else {
+                    this.position[0] += this.random.nextDouble(this.chargerPosition[0] - this.position[0]);
+                }
+                this.position[1] = this.position[0] * m + q;
             } else {
-                this.position[0] += distance;
-                this.position[1] -= distance;
-                direction = 2; // to down-right
+                this.position[0] = this.chargerPosition[0];
+                this.position[1] = this.chargerPosition[1];
             }
-
         }
-
-        this.position[2] = this.roomDimensions[2];
-
-
-         */
-        // updating time
-        this.timer = System.currentTimeMillis();
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -192,15 +116,12 @@ public class IndoorPositionSensorDescriptor {
 
     public void updateReturningHomePosition(double[] chargerPosition) {
         this.chargerPosition = chargerPosition;
+        this.returnFlag = true;
 
-        // angular coefficient
-        double m = (this.position[1] - this.chargerPosition[1]) / (this.position[0] - this.chargerPosition[0]);
+        // updating returning movement
+        updateIndoorPosition();
 
-        // distance traveled during time
-        double distance = (0.0002 * (System.currentTimeMillis() - this.timer));
-
-
-
+        this.returnFlag = false;
     }
 
     @Override

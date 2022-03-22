@@ -14,12 +14,16 @@ public class IndoorPositionSensorDescriptorTester {
         System.out.println("Testing Indoor Position Sensor ...");
 
         // requesting position
-        IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0, 0.0});
+        IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0});
 
         int control;
         for (control = 0; control < 1000; control++) {
 
-            indoorPositionSensorDescriptor.updateIndoorPosition();
+            if (control < 100) {
+                indoorPositionSensorDescriptor.updateIndoorPosition();
+            } else {
+                indoorPositionSensorDescriptor.updateReturningHomePosition(new double[]{1.5, 2.7});
+            }
             System.out.println(indoorPositionSensorDescriptor);
 
             try {
