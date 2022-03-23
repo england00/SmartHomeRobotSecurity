@@ -1,24 +1,22 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.charger;
 
-import java.util.Random;
+import java.awt.font.TextHitInfo;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 13/03/2022 - 18:19
+ * @created 22/03/2022 - 15:59
  */
-public class BatteryLevelSensorDescriptor {
+public class RobotBatteryLevelDescriptor {
 
     // sensor's parameters
-    private long timestamp;
-    private double batteryLevel = 100.0;
+    private long timestamp = System.currentTimeMillis();
+    private double batteryLevel = 0;
 
     // utility variables
-    private final transient Random random; // this variable mustn't be serialized
+    private static final double RECHARGING_SPEED = 0.003;
 
-    public BatteryLevelSensorDescriptor() {
-        this.random = new Random();
-    }
+    public RobotBatteryLevelDescriptor() {}
 
     public long getTimestamp() {
         return timestamp;
@@ -36,11 +34,11 @@ public class BatteryLevelSensorDescriptor {
         this.batteryLevel = batteryLevel;
     }
 
-    public void checkBatteryLevel(){
+    public void checkRechargingBatteryLevel(){
         // managing battery values
-        this.batteryLevel = this.batteryLevel - (this.random.nextDouble() * 5.0);
-        if (this.batteryLevel <= 0) {
-            this.batteryLevel = 0.0;
+        this.batteryLevel += (RECHARGING_SPEED * (System.currentTimeMillis() - this.timestamp));
+        if (this.batteryLevel >= 100) {
+            this.batteryLevel = 100.0;
         }
 
         // managing timestamp
@@ -49,7 +47,7 @@ public class BatteryLevelSensorDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BatteryLevelSensorDescriptor{");
+        final StringBuffer sb = new StringBuffer("RobotBatteryLevelDescriptor{");
         sb.append("timestamp=").append(timestamp);
         sb.append(", batteryLevel=").append(batteryLevel);
         sb.append('}');

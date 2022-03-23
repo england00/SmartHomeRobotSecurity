@@ -12,7 +12,7 @@ public class ReturnHomeActuatorDescriptor {
     // actuator's parameters
     private long timestamp;
     private boolean value;
-    private double[] chargerPosition = new double[3];
+    private double[] chargerPosition = new double[2];
 
     public ReturnHomeActuatorDescriptor() {
     }

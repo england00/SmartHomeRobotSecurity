@@ -46,6 +46,22 @@ public class IndoorPositionSensorDescriptor {
         return random;
     }
 
+    public double[] getChargerPosition() {
+        return chargerPosition;
+    }
+
+    public void setChargerPosition(double[] chargerPosition) {
+        this.chargerPosition = chargerPosition;
+    }
+
+    public boolean isReturnFlag() {
+        return returnFlag;
+    }
+
+    public void setReturnFlag(boolean returnFlag) {
+        this.returnFlag = returnFlag;
+    }
+
     public void updateIndoorPosition() {
 
         if (!this.returnFlag) {
@@ -112,16 +128,6 @@ public class IndoorPositionSensorDescriptor {
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
-    }
-
-    public void updateReturningHomePosition(double[] chargerPosition) {
-        this.chargerPosition = chargerPosition;
-        this.returnFlag = true;
-
-        // updating returning movement
-        updateIndoorPosition();
-
-        this.returnFlag = false;
     }
 
     @Override

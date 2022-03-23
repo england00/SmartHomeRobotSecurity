@@ -48,11 +48,8 @@ public class PassiveInfraRedSensorDescriptor {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("PassiveInfraRedSensorDescriptor{");
-        // producing data only if has been detected a presence
-        if (this.value) {
-            sb.append("timestamp=").append(timestamp);
-            sb.append(", value=").append(value);
-        }
+        sb.append("timestamp=").append(timestamp);
+        sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();
     }

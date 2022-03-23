@@ -12,7 +12,7 @@ public class ChargingStationDescriptor {
     // device's parameters
     private String chargerId;
     private String room;
-    private double[] position = new double[3];
+    private double[] position = new double[2];
     private String softwareVersion;
     private String manufacturer;
 

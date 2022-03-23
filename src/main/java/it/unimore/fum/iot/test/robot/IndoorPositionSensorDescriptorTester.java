@@ -19,10 +19,13 @@ public class IndoorPositionSensorDescriptorTester {
         int control;
         for (control = 0; control < 1000; control++) {
 
-            if (control < 100) {
+            if (control < 20 || control >= 40) {
+                indoorPositionSensorDescriptor.setReturnFlag(false);
                 indoorPositionSensorDescriptor.updateIndoorPosition();
             } else {
-                indoorPositionSensorDescriptor.updateReturningHomePosition(new double[]{1.5, 2.7});
+                indoorPositionSensorDescriptor.setChargerPosition(new double[]{1.5, 2.7});
+                indoorPositionSensorDescriptor.setReturnFlag(true);
+                indoorPositionSensorDescriptor.updateIndoorPosition();
             }
             System.out.println(indoorPositionSensorDescriptor);
 
