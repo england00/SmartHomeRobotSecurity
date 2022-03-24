@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.test.robot;
 
+import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
 import it.unimore.fum.iot.model.robot.IndoorPositionSensorDescriptor;
 
 /**
@@ -14,6 +15,7 @@ public class IndoorPositionSensorDescriptorTester {
         System.out.println("Testing Indoor Position Sensor ...");
 
         // requesting position
+        // IIndoorPositionSensorDescriptor iIndoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0});
         IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0});
 
         int control;

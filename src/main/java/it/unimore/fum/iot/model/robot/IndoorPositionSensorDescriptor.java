@@ -8,7 +8,7 @@ import java.util.Random;
  * @project SMART-HOME-robot-security
  * @created 12/03/2022 - 16:39
  */
-public class IndoorPositionSensorDescriptor {
+public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDescriptor {
 
     // sensor's parameters
     private long timestamp = System.currentTimeMillis();
@@ -62,6 +62,7 @@ public class IndoorPositionSensorDescriptor {
         this.returnFlag = returnFlag;
     }
 
+    @Override
     public void updateIndoorPosition() {
 
         if (!this.returnFlag) {

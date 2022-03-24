@@ -13,7 +13,7 @@ public class EnergyConsumptionSensorDescriptorTester {
 
         System.out.println("Testing Battery Level Sensor ...");
 
-        // requesting battery level
+        // requesting energy consumption
         EnergyConsumptionSensorDescriptor energyConsumptionSensorDescriptor = new EnergyConsumptionSensorDescriptor();
 
         int control;

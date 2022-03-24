@@ -18,20 +18,20 @@ public class ChargingStationDescriptor {
 
     public ChargingStationDescriptor() {}
 
-    public ChargingStationDescriptor(String robotId, String room, double[] position, String softwareVersion, String manufacturer) {
-        this.chargerId = robotId;
+    public ChargingStationDescriptor(String chargerId, String room, double[] position, String softwareVersion, String manufacturer) {
+        this.chargerId = chargerId;
         this.room = room;
         this.position = position;
         this.softwareVersion = softwareVersion;
         this.manufacturer = manufacturer;
     }
 
-    public String getRobotId() {
+    public String getChargerId() {
         return chargerId;
     }
 
-    public void setRobotId(String robotId) {
-        this.chargerId = robotId;
+    public void setChargerId(String chargerId) {
+        this.chargerId = chargerId;
     }
 
     public String getRoom() {

@@ -5,7 +5,7 @@ package it.unimore.fum.iot.model.presence;
  * @project SMART-HOME-robot-security
  * @created 15/03/2022 - 12:46
  */
-public class PresenceMonitoringDescriptor {
+public class PresenceMonitoringObjectDescriptor {
 
     // device's parameters
     private String presenceId;
@@ -13,9 +13,9 @@ public class PresenceMonitoringDescriptor {
     private String softwareVersion;
     private String manufacturer;
 
-    public PresenceMonitoringDescriptor() {}
+    public PresenceMonitoringObjectDescriptor() {}
 
-    public PresenceMonitoringDescriptor(String presenceId, String room, String softwareVersion, String manufacturer) {
+    public PresenceMonitoringObjectDescriptor(String presenceId, String room, String softwareVersion, String manufacturer) {
         this.presenceId = presenceId;
         this.room = room;
         this.softwareVersion = softwareVersion;
