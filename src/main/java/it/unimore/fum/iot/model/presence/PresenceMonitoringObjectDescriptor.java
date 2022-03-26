@@ -7,7 +7,7 @@ package it.unimore.fum.iot.model.presence;
  */
 public class PresenceMonitoringObjectDescriptor {
 
-    // device's parameters
+    // object's parameters
     private String presenceId;
     private String room;
     private String softwareVersion;

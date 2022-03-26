@@ -7,7 +7,7 @@ package it.unimore.fum.iot.model.robot;
  */
 public class RobotDescriptor {
 
-    // device's parameters
+    // object's parameters
     private String robotId;
     private String room;
     private String softwareVersion;

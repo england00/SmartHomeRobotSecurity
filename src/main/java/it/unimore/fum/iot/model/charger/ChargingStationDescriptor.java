@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class ChargingStationDescriptor {
 
-    // device's parameters
+    // object's parameters
     private String chargerId;
     private String room;
     private double[] position = new double[2];
