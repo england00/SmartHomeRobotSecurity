@@ -32,6 +32,7 @@ public class BatteryLevelSensorDescriptor {
         return batteryLevel;
     }
 
+    // reset on 100.0 by the CHARGING STATION
     public void setBatteryLevel(double batteryLevel) {
         this.batteryLevel = batteryLevel;
     }

@@ -50,6 +50,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         return chargerPosition;
     }
 
+    // set by the RETURN HOME ACTUATOR
     public void setChargerPosition(double[] chargerPosition) {
         this.chargerPosition = chargerPosition;
     }
@@ -58,6 +59,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         return returnFlag;
     }
 
+    // set by the RETURN HOME ACTUATOR
     public void setReturnFlag(boolean returnFlag) {
         this.returnFlag = returnFlag;
     }
