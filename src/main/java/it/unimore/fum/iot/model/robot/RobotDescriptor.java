@@ -10,12 +10,12 @@ public class RobotDescriptor {
     // object's parameters
     private String robotId;
     private String room;
-    private String softwareVersion;
+    private Number softwareVersion;
     private String manufacturer;
 
     public RobotDescriptor() {}
 
-    public RobotDescriptor(String robotId, String room, String softwareVersion, String manufacturer) {
+    public RobotDescriptor(String robotId, String room, Number softwareVersion, String manufacturer) {
         this.robotId = robotId;
         this.room = room;
         this.softwareVersion = softwareVersion;
@@ -38,11 +38,11 @@ public class RobotDescriptor {
         this.room = room;
     }
 
-    public String getSoftwareVersion() {
+    public Number getSoftwareVersion() {
         return softwareVersion;
     }
 
-    public void setSoftwareVersion(String softwareVersion) {
+    public void setSoftwareVersion(Number softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
 
@@ -59,8 +59,8 @@ public class RobotDescriptor {
         final StringBuffer sb = new StringBuffer("RobotDescriptor{");
         sb.append("robotId='").append(robotId).append('\'');
         sb.append(", room='").append(room).append('\'');
+        sb.append(", softwareVersion=").append(softwareVersion);
         sb.append(", manufacturer='").append(manufacturer).append('\'');
-        sb.append(", softwareVersion='").append(softwareVersion).append('\'');
         sb.append('}');
         return sb.toString();
     }

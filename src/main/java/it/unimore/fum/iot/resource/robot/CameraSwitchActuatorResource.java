@@ -2,6 +2,7 @@ package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
 import it.unimore.fum.iot.model.robot.CameraSwitchActuatorDescriptor;
+import it.unimore.fum.iot.request.MakeCameraSwitchRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -23,7 +24,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
     private Gson gson;
     private CameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor;
     private String robotId = null;
-    private static final Number SENSOR_VERSION = 0.1;
+    private static final Number ACTUATOR_VERSION = 0.1;
 
     public CameraSwitchActuatorResource (String name, String robotId) {
         super(name);
@@ -33,7 +34,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
 
     public void init() {
         this.gson = new Gson();
-        this.cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor();
+        this.cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor(this.robotId, ACTUATOR_VERSION);
 
         getAttributes().setTitle(OBJECT_TITLE);
         getAttributes().addAttribute("rt", "it.unimore.robot.actuator.camera");
@@ -52,7 +53,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
             senMLRecord.setBn(this.robotId);
             senMLRecord.setN("camera");
             senMLRecord.setT(this.cameraSwitchActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(SENSOR_VERSION);
+            senMLRecord.setBver(ACTUATOR_VERSION);
             senMLRecord.setVb(this.cameraSwitchActuatorDescriptor.isValue());
 
             senMLPack.add(senMLRecord);
@@ -90,12 +91,44 @@ public class CameraSwitchActuatorResource extends CoapResource {
     @Override
     public void handlePOST(CoapExchange exchange) {
         try {
-            this.cameraSwitchActuatorDescriptor.setValue(!this.cameraSwitchActuatorDescriptor.isValue());
+            if (this.cameraSwitchActuatorDescriptor.isValue()) {
+                this.cameraSwitchActuatorDescriptor.switchStatusOff();
+            } else {
+                this.cameraSwitchActuatorDescriptor.switchStatusOn();
+            }
+
             exchange.respond(ResponseCode.CHANGED);
             changed();
+
         } catch (Exception e){
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // behaviour to PUT function
+    @Override
+    public void handlePUT(CoapExchange exchange) {
+        try {
+            String receivedPayload = new String(exchange.getRequestPayload());
+            MakeCameraSwitchRequest makeCameraSwitchRequest = this.gson.fromJson(receivedPayload, MakeCameraSwitchRequest.class);
+
+            if (makeCameraSwitchRequest != null && makeCameraSwitchRequest.getType() != null && makeCameraSwitchRequest.getType().length() > 0) {
+                if (makeCameraSwitchRequest.getType().equals(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)) {
+                    this.cameraSwitchActuatorDescriptor.switchStatusOn();
+                    exchange.respond(ResponseCode.CHANGED);
+                    changed();
+                } else if(makeCameraSwitchRequest.getType().equals(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)){
+                    this.cameraSwitchActuatorDescriptor.switchStatusOff();
+                    exchange.respond(ResponseCode.CHANGED);
+                    changed();
+                } else
+                    exchange.respond(ResponseCode.BAD_REQUEST);
+            }
+            else
+                exchange.respond(ResponseCode.BAD_REQUEST);
+
+        } catch (Exception e){
+            exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
