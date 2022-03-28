@@ -14,7 +14,7 @@ public class BatteryLevelSensorDescriptorTester {
         System.out.println("Testing Battery Level Sensor ...");
 
         // requesting battery level
-        BatteryLevelSensorDescriptor batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor();
+        BatteryLevelSensorDescriptor batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor("robot-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {

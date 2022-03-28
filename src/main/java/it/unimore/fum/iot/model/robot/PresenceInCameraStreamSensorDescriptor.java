@@ -10,14 +10,26 @@ import java.util.Random;
 public class PresenceInCameraStreamSensorDescriptor {
 
     // sensor's parameters
+    private String robotId;
     private long timestamp;
+    private Number version;
     private boolean value;
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
 
-    public PresenceInCameraStreamSensorDescriptor() {
+    public PresenceInCameraStreamSensorDescriptor(String robotId, Number version) {
+        this.robotId = robotId;
+        this.version = version;
         this.random = new Random();
+    }
+
+    public String getRobotId() {
+        return robotId;
+    }
+
+    public void setRobotId(String robotId) {
+        this.robotId = robotId;
     }
 
     public long getTimestamp() {
@@ -26,6 +38,14 @@ public class PresenceInCameraStreamSensorDescriptor {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Number getVersion() {
+        return version;
+    }
+
+    public void setVersion(Number version) {
+        this.version = version;
     }
 
     public boolean isValue() {
@@ -48,7 +68,9 @@ public class PresenceInCameraStreamSensorDescriptor {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("PresenceInCameraStreamSensorDescriptor{");
-        sb.append("timestamp=").append(timestamp);
+        sb.append("robotId='").append(robotId).append('\'');
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", version=").append(version);
         sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();

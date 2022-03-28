@@ -11,8 +11,11 @@ import java.util.Random;
 public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDescriptor {
 
     // sensor's parameters
+    private String robotId;
     private long timestamp = System.currentTimeMillis();
+    private Number version;
     private double[] position = new double[2]; // 2 values array
+    private String unit = "meter";
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
@@ -21,9 +24,19 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
     private double[] chargerPosition;
     private boolean returnFlag = false;
 
-    public IndoorPositionSensorDescriptor(double[] roomDimensions) {
+    public IndoorPositionSensorDescriptor(String robotId, Number version, double[] roomDimensions) {
+        this.robotId = robotId;
+        this.version = version;
         this.random = new Random();
         this.roomDimensions = roomDimensions;
+    }
+
+    public String getRobotId() {
+        return robotId;
+    }
+
+    public void setRobotId(String robotId) {
+        this.robotId = robotId;
     }
 
     public long getTimestamp() {
@@ -34,12 +47,22 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.timestamp = timestamp;
     }
 
+
+
     public double[] getPosition() {
         return position;
     }
 
     public void setPosition(double[] position) {
         this.position = position;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public Random getRandom() {
@@ -136,8 +159,11 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("IndoorPositionSensorDescriptor{");
-        sb.append("timestamp=").append(timestamp);
+        sb.append("robotId='").append(robotId).append('\'');
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", version=").append(version);
         sb.append(", position=").append(Arrays.toString(position));
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }

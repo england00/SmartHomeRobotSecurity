@@ -10,14 +10,27 @@ import java.util.Random;
 public class BatteryLevelSensorDescriptor {
 
     // sensor's parameters
+    private String robotId;
     private long timestamp;
+    private Number version;
     private double batteryLevel = 100.0;
+    private String unit = "%";
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
 
-    public BatteryLevelSensorDescriptor() {
+    public BatteryLevelSensorDescriptor(String robotId, Number version) {
+        this.robotId = robotId;
+        this.version = version;
         this.random = new Random();
+    }
+
+    public String getRobotId() {
+        return robotId;
+    }
+
+    public void setRobotId(String robotId) {
+        this.robotId = robotId;
     }
 
     public long getTimestamp() {
@@ -28,6 +41,14 @@ public class BatteryLevelSensorDescriptor {
         this.timestamp = timestamp;
     }
 
+    public Number getVersion() {
+        return version;
+    }
+
+    public void setVersion(Number version) {
+        this.version = version;
+    }
+
     public double getBatteryLevel() {
         return batteryLevel;
     }
@@ -35,6 +56,14 @@ public class BatteryLevelSensorDescriptor {
     // reset on 100.0 by the CHARGING STATION
     public void setBatteryLevel(double batteryLevel) {
         this.batteryLevel = batteryLevel;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public void checkBatteryLevel(){
@@ -51,8 +80,11 @@ public class BatteryLevelSensorDescriptor {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("BatteryLevelSensorDescriptor{");
-        sb.append("timestamp=").append(timestamp);
+        sb.append("robotId='").append(robotId).append('\'');
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", version=").append(version);
         sb.append(", batteryLevel=").append(batteryLevel);
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }
