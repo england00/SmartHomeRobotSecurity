@@ -10,7 +10,6 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import it.unimore.fum.iot.utils.CoreInterfaces;
-
 import java.util.Optional;
 
 /**
@@ -59,15 +58,16 @@ public class IndoorPositionSensorResource extends CoapResource {
             senMLRecord.setN("position");
             senMLRecord.setT(this.indoorPositionSensorDescriptor.getTimestamp());
             senMLRecord.setBver(SENSOR_VERSION);
-            senMLRecord.setBu(UNIT);
 
             SenMLRecord measureRecordX = new SenMLRecord();
             senMLRecord.setU("X");
             senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[0]);
+            senMLRecord.setU(UNIT);
 
             SenMLRecord measureRecordY = new SenMLRecord();
             senMLRecord.setU("Y");
             senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[1]);
+            senMLRecord.setU(UNIT);
 
             senMLPack.add(senMLRecord);
             senMLPack.add(measureRecordX);

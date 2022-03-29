@@ -47,7 +47,13 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.timestamp = timestamp;
     }
 
+    public Number getVersion() {
+        return version;
+    }
 
+    public void setVersion(Number version) {
+        this.version = version;
+    }
 
     public double[] getPosition() {
         return position;

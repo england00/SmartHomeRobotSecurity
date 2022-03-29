@@ -10,15 +10,27 @@ import java.util.Arrays;
 public class ReturnHomeActuatorDescriptor {
 
     // actuator's parameters
+    private String robotId;
     private long timestamp;
+    private Number version;
     private boolean value;
-    private double[] chargerPosition = new double[2];
+    private double[] chargerPosition = null;
+    private String unit = "meter";
 
     public ReturnHomeActuatorDescriptor() {
     }
 
-    public ReturnHomeActuatorDescriptor(double[] chargerPosition) {
-        this.chargerPosition = chargerPosition;
+    public ReturnHomeActuatorDescriptor(String robotId, Number version) {
+        this.robotId = robotId;
+        this.version = version;
+    }
+
+    public String getRobotId() {
+        return robotId;
+    }
+
+    public void setRobotId(String robotId) {
+        this.robotId = robotId;
     }
 
     public long getTimestamp() {
@@ -27,6 +39,14 @@ public class ReturnHomeActuatorDescriptor {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Number getVersion() {
+        return version;
+    }
+
+    public void setVersion(Number version) {
+        this.version = version;
     }
 
     public boolean isValue() {
@@ -43,6 +63,14 @@ public class ReturnHomeActuatorDescriptor {
 
     public void setChargerPosition(double[] chargerPosition) {
         this.chargerPosition = chargerPosition;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public void switchReturnOn(){
@@ -64,9 +92,12 @@ public class ReturnHomeActuatorDescriptor {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ReturnHomeActuatorDescriptor{");
-        sb.append("timestamp=").append(timestamp);
-        sb.append(" value=").append(value);
+        sb.append("robotId='").append(robotId).append('\'');
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", version=").append(version);
+        sb.append(", value=").append(value);
         sb.append(", chargerPosition=").append(Arrays.toString(chargerPosition));
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }
