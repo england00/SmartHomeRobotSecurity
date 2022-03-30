@@ -10,12 +10,12 @@ public class PresenceMonitoringObjectDescriptor {
     // object's parameters
     private String presenceId;
     private String room;
-    private String softwareVersion;
+    private Number softwareVersion;
     private String manufacturer;
 
     public PresenceMonitoringObjectDescriptor() {}
 
-    public PresenceMonitoringObjectDescriptor(String presenceId, String room, String softwareVersion, String manufacturer) {
+    public PresenceMonitoringObjectDescriptor(String presenceId, String room, Number softwareVersion, String manufacturer) {
         this.presenceId = presenceId;
         this.room = room;
         this.softwareVersion = softwareVersion;
@@ -38,11 +38,11 @@ public class PresenceMonitoringObjectDescriptor {
         this.room = room;
     }
 
-    public String getSoftwareVersion() {
+    public Number getSoftwareVersion() {
         return softwareVersion;
     }
 
-    public void setSoftwareVersion(String softwareVersion) {
+    public void setSoftwareVersion(Number softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
 
@@ -59,8 +59,8 @@ public class PresenceMonitoringObjectDescriptor {
         final StringBuffer sb = new StringBuffer("PresenceMonitoringDescriptor{");
         sb.append("presenceId='").append(presenceId).append('\'');
         sb.append(", room='").append(room).append('\'');
+        sb.append(", softwareVersion=").append(softwareVersion);
         sb.append(", manufacturer='").append(manufacturer).append('\'');
-        sb.append(", softwareVersion='").append(softwareVersion).append('\'');
         sb.append('}');
         return sb.toString();
     }
