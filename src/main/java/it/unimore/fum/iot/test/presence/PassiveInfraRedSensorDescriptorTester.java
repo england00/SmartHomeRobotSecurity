@@ -15,7 +15,7 @@ public class PassiveInfraRedSensorDescriptorTester {
         System.out.println("Testing PIR Sensor ...");
 
         // requesting PIR signal
-        PassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor();
+        PassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor("presence-monitoring-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {

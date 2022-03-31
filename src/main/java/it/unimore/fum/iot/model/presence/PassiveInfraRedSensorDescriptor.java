@@ -10,14 +10,26 @@ import java.util.Random;
 public class PassiveInfraRedSensorDescriptor {
 
     // sensor's parameters
+    private String presenceId;
     private long timestamp;
+    private Number version;
     private boolean value;
 
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
 
-    public PassiveInfraRedSensorDescriptor() {
+    public PassiveInfraRedSensorDescriptor(String presenceId, Number version) {
+        this.presenceId = presenceId;
+        this.version = version;
         this.random = new Random();
+    }
+
+    public String getPresenceId() {
+        return presenceId;
+    }
+
+    public void setPresenceId(String presenceId) {
+        this.presenceId = presenceId;
     }
 
     public long getTimestamp() {
@@ -26,6 +38,14 @@ public class PassiveInfraRedSensorDescriptor {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Number getVersion() {
+        return version;
+    }
+
+    public void setVersion(Number version) {
+        this.version = version;
     }
 
     public boolean isValue() {
@@ -48,7 +68,9 @@ public class PassiveInfraRedSensorDescriptor {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("PassiveInfraRedSensorDescriptor{");
-        sb.append("timestamp=").append(timestamp);
+        sb.append("presenceId='").append(presenceId).append('\'');
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", version=").append(version);
         sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();
