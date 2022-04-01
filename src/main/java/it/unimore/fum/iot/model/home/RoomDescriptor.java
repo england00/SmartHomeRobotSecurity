@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model;
+package it.unimore.fum.iot.model.home;
 
 import java.util.Arrays;
 
@@ -38,7 +38,7 @@ public class RoomDescriptor {
     public String toString() {
         final StringBuffer sb = new StringBuffer("RoomDescriptor{");
         sb.append(", room='").append(room).append('\'');
-        sb.append(", position=").append(Arrays.toString(dimensions));
+        sb.append(", dimensions=").append(Arrays.toString(dimensions));
         sb.append('}');
         return sb.toString();
     }

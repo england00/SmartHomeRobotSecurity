@@ -26,6 +26,8 @@ public class DefaultSmartObjectsInventoryManager implements ISmartObjectsInvento
         this.robotMap = new HashMap<>();
     }
 
+
+
     // Charging Station management
 
     // READ THE LIST of all the charging stations
