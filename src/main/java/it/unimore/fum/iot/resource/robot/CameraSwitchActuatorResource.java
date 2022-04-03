@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.CameraSwitchActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
 import it.unimore.fum.iot.request.MakeCameraSwitchRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -21,19 +21,16 @@ public class CameraSwitchActuatorResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "CameraSwitchActuator";
     private Gson gson;
-    private CameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor;
-    private String robotId = null;
-    private static final Number ACTUATOR_VERSION = 0.1;
+    private final ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor;
 
-    public CameraSwitchActuatorResource (String name, String robotId) {
+    public CameraSwitchActuatorResource (String name, ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor) {
         super(name);
-        this.robotId = robotId;
+        this.cameraSwitchActuatorDescriptor = cameraSwitchActuatorDescriptor;
         init();
     }
 
     public void init() {
         this.gson = new Gson();
-        this.cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor(this.robotId, ACTUATOR_VERSION);
 
         getAttributes().setTitle(OBJECT_TITLE);
         getAttributes().addAttribute("rt", "it.unimore.robot.actuator.camera");
@@ -49,10 +46,10 @@ public class CameraSwitchActuatorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.cameraSwitchActuatorDescriptor.getRobotId());
             senMLRecord.setN("camera");
             senMLRecord.setT(this.cameraSwitchActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(ACTUATOR_VERSION);
+            senMLRecord.setBver(this.cameraSwitchActuatorDescriptor.getVersion());
             senMLRecord.setVb(this.cameraSwitchActuatorDescriptor.isValue());
 
             senMLPack.add(senMLRecord);
@@ -67,6 +64,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -89,6 +87,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
     // behaviour to POST function
     @Override
     public void handlePOST(CoapExchange exchange) {
+
         try {
             if (this.cameraSwitchActuatorDescriptor.isValue()) {
                 this.cameraSwitchActuatorDescriptor.switchStatusOff();
@@ -107,6 +106,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
     // behaviour to PUT function
     @Override
     public void handlePUT(CoapExchange exchange) {
+
         try {
             String receivedPayload = new String(exchange.getRequestPayload());
             MakeCameraSwitchRequest makeCameraSwitchRequest = this.gson.fromJson(receivedPayload, MakeCameraSwitchRequest.class);

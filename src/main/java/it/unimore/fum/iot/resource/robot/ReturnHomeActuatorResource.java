@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.ReturnHomeActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.IReturnHomeActuatorDescriptor;
 import it.unimore.fum.iot.request.MakeReturnHomeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -21,20 +21,17 @@ public class ReturnHomeActuatorResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "ReturnHomeActuator";
     private Gson gson;
-    private ReturnHomeActuatorDescriptor returnHomeActuatorDescriptor;
-    private String robotId = null;
-    private static final Number ACTUATOR_VERSION = 0.1;
+    private final IReturnHomeActuatorDescriptor returnHomeActuatorDescriptor;
     private static final String UNIT = "m";
 
-    public ReturnHomeActuatorResource(String name, String robotId) {
+    public ReturnHomeActuatorResource(String name, IReturnHomeActuatorDescriptor returnHomeActuatorDescriptor) {
         super(name);
-        this.robotId = robotId;
+        this.returnHomeActuatorDescriptor = returnHomeActuatorDescriptor;
         init();
     }
 
     private void init(){
         this.gson = new Gson();
-        this.returnHomeActuatorDescriptor = new ReturnHomeActuatorDescriptor(this.robotId, ACTUATOR_VERSION);
 
         getAttributes().setTitle(OBJECT_TITLE);
         getAttributes().addAttribute("rt", "it.unimore.robot.actuator.home");
@@ -50,10 +47,10 @@ public class ReturnHomeActuatorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.returnHomeActuatorDescriptor.getRobotId());
             senMLRecord.setN("home");
             senMLRecord.setT(this.returnHomeActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(ACTUATOR_VERSION);
+            senMLRecord.setBver(this.returnHomeActuatorDescriptor.getVersion());
             senMLRecord.setVb(this.returnHomeActuatorDescriptor.isValue());
 
             SenMLRecord measureRecordX = new SenMLRecord();
@@ -80,6 +77,7 @@ public class ReturnHomeActuatorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -102,6 +100,7 @@ public class ReturnHomeActuatorResource extends CoapResource {
     // behaviour to POST function
     @Override
     public void handlePOST(CoapExchange exchange) {
+
         try {
             this.returnHomeActuatorDescriptor.switchReturnOff();
             this.returnHomeActuatorDescriptor.setChargerPosition(null);
@@ -115,6 +114,7 @@ public class ReturnHomeActuatorResource extends CoapResource {
     // behaviour to PUT function
     @Override
     public void handlePUT(CoapExchange exchange) {
+
         try {
             String receivedPayload = new String(exchange.getRequestPayload());
             MakeReturnHomeRequest makeReturnHomeRequest = this.gson.fromJson(receivedPayload, MakeReturnHomeRequest.class);

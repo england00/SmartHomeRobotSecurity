@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class FileToHashMap {
 
-    final static String filePath = "./src/main/java/it/unimore/fum/iot/persistence/write.txt";
+    final static String filePath = "./src/main/java/it/unimore/fum/iot/persistence/robotId.txt";
 
     public static void main(String[] args) {
 

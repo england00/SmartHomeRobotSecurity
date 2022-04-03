@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.PresenceInCameraStreamSensorDescriptor;
+import it.unimore.fum.iot.model.robot.IPresenceInCameraStreamSensorDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -21,19 +21,16 @@ public class PresenceInCameraStreamSensorResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "PresenceInCameraStreamSensor";
     private Gson gson;
-    private PresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor;
-    private String robotId = null;
-    private static final Number SENSOR_VERSION = 0.1;
+    private final IPresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor;
 
-    public PresenceInCameraStreamSensorResource(String name, String robotId) {
+    public PresenceInCameraStreamSensorResource(String name, IPresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor) {
         super(name);
-        this.robotId = robotId;
+        this.presenceInCameraStreamSensorDescriptor = presenceInCameraStreamSensorDescriptor;
         init();
     }
 
     private void init(){
         this.gson = new Gson();
-        this.presenceInCameraStreamSensorDescriptor = new PresenceInCameraStreamSensorDescriptor(this.robotId, SENSOR_VERSION);
 
         // enable observing and configure notification type
         setObservable(true);
@@ -53,10 +50,10 @@ public class PresenceInCameraStreamSensorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.presenceInCameraStreamSensorDescriptor.getRobotId());
             senMLRecord.setN("presence");
             senMLRecord.setT(this.presenceInCameraStreamSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(SENSOR_VERSION);
+            senMLRecord.setBver(this.presenceInCameraStreamSensorDescriptor.getVersion());
             senMLRecord.setVb(this.presenceInCameraStreamSensorDescriptor.isValue());
 
             senMLPack.add(senMLRecord);
@@ -71,6 +68,7 @@ public class PresenceInCameraStreamSensorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             this.presenceInCameraStreamSensorDescriptor.checkPresenceInCameraStream();
 

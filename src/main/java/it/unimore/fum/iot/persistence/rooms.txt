@@ -1,0 +1,1 @@
+home:RoomDescriptor{room='home', dimensions=[15.0, 20.0], origin=[0.0, 0.0]}

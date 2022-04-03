@@ -1,30 +1,28 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.robot.raw;
 
-import java.util.Arrays;
+import it.unimore.fum.iot.model.robot.IModeActuatorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 15/03/2022 - 02:59
+ * @created 15/03/2022 - 02:45
  */
-public class ReturnHomeActuatorDescriptor {
+public class ModeActuatorDescriptor implements IModeActuatorDescriptor {
 
     // actuator's parameters
     private String robotId;
     private long timestamp;
     private Number version;
-    private boolean value;
-    private double[] chargerPosition = null;
-    private String unit = "meter";
+    private String value;
 
-    public ReturnHomeActuatorDescriptor() {
-    }
+    public ModeActuatorDescriptor() {}
 
-    public ReturnHomeActuatorDescriptor(String robotId, Number version) {
+    public ModeActuatorDescriptor(String robotId, Number version) {
         this.robotId = robotId;
         this.version = version;
     }
 
+    @Override
     public String getRobotId() {
         return robotId;
     }
@@ -33,6 +31,7 @@ public class ReturnHomeActuatorDescriptor {
         this.robotId = robotId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -41,6 +40,7 @@ public class ReturnHomeActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -49,41 +49,37 @@ public class ReturnHomeActuatorDescriptor {
         this.version = version;
     }
 
-    public boolean isValue() {
+    @Override
+    public String getValue() {
         return value;
     }
 
-    public void setValue(boolean value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    public double[] getChargerPosition() {
-        return chargerPosition;
-    }
-
-    public void setChargerPosition(double[] chargerPosition) {
-        this.chargerPosition = chargerPosition;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public void switchReturnOn(){
-        // managing status
-        this.value = true;
+    @Override
+    public void modeStart(){
+        // managing mode
+        this.value = "START";
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
     }
 
-    public void switchReturnOff(){
-        // managing status
-        this.value = false;
+    @Override
+    public void modePause(){
+        // managing mode
+        this.value = "PAUSE";
+
+        // managing timestamp
+        this.timestamp = System.currentTimeMillis();
+    }
+
+    @Override
+    public void modeStop(){
+        // managing mode
+        this.value = "STOP";
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -91,13 +87,11 @@ public class ReturnHomeActuatorDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ReturnHomeActuatorDescriptor{");
+        final StringBuffer sb = new StringBuffer("ModeActuatorDescriptor{");
         sb.append("robotId='").append(robotId).append('\'');
         sb.append(", timestamp=").append(timestamp);
         sb.append(", version=").append(version);
-        sb.append(", value=").append(value);
-        sb.append(", chargerPosition=").append(Arrays.toString(chargerPosition));
-        sb.append(", unit='").append(unit).append('\'');
+        sb.append(", value='").append(value).append('\'');
         sb.append('}');
         return sb.toString();
     }

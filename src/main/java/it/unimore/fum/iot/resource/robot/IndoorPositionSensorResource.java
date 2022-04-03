@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.IndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
 import org.eclipse.californium.core.CoapResource;
@@ -21,20 +21,17 @@ public class IndoorPositionSensorResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "IndoorPositionSensor";
     private Gson gson;
-    private IndoorPositionSensorDescriptor indoorPositionSensorDescriptor;
-    private String robotId = null;
-    private static final Number SENSOR_VERSION = 0.1;
+    private final IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor;
     private static final String UNIT = "m";
 
-    public IndoorPositionSensorResource(String name, String robotId, double[] roomDimensions) {
+    public IndoorPositionSensorResource(String name, IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor) {
         super(name);
-        this.robotId = robotId;
-        init(roomDimensions);
+        this.indoorPositionSensorDescriptor = indoorPositionSensorDescriptor;
+        init(this.indoorPositionSensorDescriptor.getRoomDimensions(), this.indoorPositionSensorDescriptor.getOrigin());
     }
 
-    private void init(double[] roomDimensions){
+    private void init(double[] roomDimensions, double[] origin){
         this.gson = new Gson();
-        this.indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(this.robotId, SENSOR_VERSION, roomDimensions);
 
         // enable observing
         setObservable(true);
@@ -54,10 +51,10 @@ public class IndoorPositionSensorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.indoorPositionSensorDescriptor.getRobotId());
             senMLRecord.setN("position");
             senMLRecord.setT(this.indoorPositionSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(SENSOR_VERSION);
+            senMLRecord.setBver(this.indoorPositionSensorDescriptor.getVersion());
 
             SenMLRecord measureRecordX = new SenMLRecord();
             senMLRecord.setU("X");
@@ -83,6 +80,7 @@ public class IndoorPositionSensorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             this.indoorPositionSensorDescriptor.updateIndoorPosition();
 

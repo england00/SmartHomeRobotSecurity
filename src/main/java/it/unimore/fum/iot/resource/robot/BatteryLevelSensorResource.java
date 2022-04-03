@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.BatteryLevelSensorDescriptor;
+import it.unimore.fum.iot.model.robot.IBatteryLevelSensorDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -21,20 +21,17 @@ public class BatteryLevelSensorResource extends CoapResource{
 
     private static final String OBJECT_TITLE = "BatteryLevelSensor";
     private Gson gson;
-    private BatteryLevelSensorDescriptor batteryLevelSensorDescriptor;
-    private String robotId = null;
-    private static final Number SENSOR_VERSION = 0.1;
+    private final IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor;
     private static final String UNIT = "%EL";
 
-    public BatteryLevelSensorResource(String name, String robotId) {
+    public BatteryLevelSensorResource(String name, IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor) {
         super(name);
-        this.robotId = robotId;
+        this.batteryLevelSensorDescriptor = batteryLevelSensorDescriptor;
         init();
     }
 
     private void init(){
         this.gson = new Gson();
-        this.batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor(robotId, SENSOR_VERSION);
 
         // enable observing and configure notification type
         setObservable(true);
@@ -54,10 +51,10 @@ public class BatteryLevelSensorResource extends CoapResource{
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.batteryLevelSensorDescriptor.getRobotId());
             senMLRecord.setN("battery");
             senMLRecord.setT(this.batteryLevelSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(SENSOR_VERSION);
+            senMLRecord.setBver(this.batteryLevelSensorDescriptor.getVersion());
             senMLRecord.setBu(UNIT);
             senMLRecord.setV(this.batteryLevelSensorDescriptor.getBatteryLevel());
 
@@ -73,6 +70,7 @@ public class BatteryLevelSensorResource extends CoapResource{
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             this.batteryLevelSensorDescriptor.checkBatteryLevel();
 

@@ -1,4 +1,6 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.robot.raw;
+
+import it.unimore.fum.iot.model.robot.IPresenceInCameraStreamSensorDescriptor;
 
 import java.util.Random;
 
@@ -7,7 +9,7 @@ import java.util.Random;
  * @project SMART-HOME-robot-security
  * @created 15/03/2022 - 01:44
  */
-public class PresenceInCameraStreamSensorDescriptor {
+public class PresenceInCameraStreamSensorDescriptor implements IPresenceInCameraStreamSensorDescriptor {
 
     // sensor's parameters
     private String robotId;
@@ -24,6 +26,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.random = new Random();
     }
 
+    @Override
     public String getRobotId() {
         return robotId;
     }
@@ -32,6 +35,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.robotId = robotId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -40,6 +44,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -48,6 +53,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.version = version;
     }
 
+    @Override
     public boolean isValue() {
         return value;
     }
@@ -56,6 +62,7 @@ public class PresenceInCameraStreamSensorDescriptor {
         this.value = value;
     }
 
+    @Override
     public void checkPresenceInCameraStream(){
         // managing value
         int num = this.random.nextInt(10);

@@ -1,4 +1,6 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.robot.raw;
+
+import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
 
 import java.util.Random;
 
@@ -7,7 +9,7 @@ import java.util.Random;
  * @project SMART-HOME-robot-security
  * @created 15/03/2022 - 02:14
  */
-public class CameraSwitchActuatorDescriptor {
+public class CameraSwitchActuatorDescriptor implements ICameraSwitchActuatorDescriptor {
 
     // actuator's parameters
     private String robotId;
@@ -22,6 +24,7 @@ public class CameraSwitchActuatorDescriptor {
         this.version = version;
     }
 
+    @Override
     public String getRobotId() {
         return robotId;
     }
@@ -30,6 +33,7 @@ public class CameraSwitchActuatorDescriptor {
         this.robotId = robotId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -38,6 +42,7 @@ public class CameraSwitchActuatorDescriptor {
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -46,6 +51,7 @@ public class CameraSwitchActuatorDescriptor {
         this.version = version;
     }
 
+    @Override
     public boolean isValue() {
         return value;
     }
@@ -54,6 +60,7 @@ public class CameraSwitchActuatorDescriptor {
         this.value = value;
     }
 
+    @Override
     public void switchStatusOn(){
         // managing status
         this.value = true;
@@ -62,6 +69,7 @@ public class CameraSwitchActuatorDescriptor {
         this.timestamp = System.currentTimeMillis();
     }
 
+    @Override
     public void switchStatusOff(){
         // managing status
         this.value = false;

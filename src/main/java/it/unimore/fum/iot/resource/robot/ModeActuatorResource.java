@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.ModeActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.IModeActuatorDescriptor;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -21,19 +21,16 @@ public class ModeActuatorResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "ModeActuator";
     private Gson gson;
-    private ModeActuatorDescriptor modeActuatorDescriptor;
-    private String robotId = null;
-    private static final Number ACTUATOR_VERSION = 0.1;
+    private final IModeActuatorDescriptor modeActuatorDescriptor;
 
-    public ModeActuatorResource (String name, String robotId) {
+    public ModeActuatorResource (String name, IModeActuatorDescriptor modeActuatorDescriptor) {
         super(name);
-        this.robotId = robotId;
+        this.modeActuatorDescriptor = modeActuatorDescriptor;
         init();
     }
 
     public void init() {
         this.gson = new Gson();
-        this.modeActuatorDescriptor = new ModeActuatorDescriptor(this.robotId, ACTUATOR_VERSION);
 
         getAttributes().setTitle(OBJECT_TITLE);
         getAttributes().addAttribute("rt", "it.unimore.robot.actuator.mode");
@@ -49,10 +46,10 @@ public class ModeActuatorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.robotId);
+            senMLRecord.setBn(this.modeActuatorDescriptor.getRobotId());
             senMLRecord.setN("mode");
             senMLRecord.setT(this.modeActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(ACTUATOR_VERSION);
+            senMLRecord.setBver(this.modeActuatorDescriptor.getVersion());
             senMLRecord.setVs(this.modeActuatorDescriptor.getValue());
 
             senMLPack.add(senMLRecord);
@@ -67,6 +64,7 @@ public class ModeActuatorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -89,6 +87,7 @@ public class ModeActuatorResource extends CoapResource {
     // behaviour to POST function
     @Override
     public void handlePOST(CoapExchange exchange) {
+
         try {
             if (this.modeActuatorDescriptor.getValue().equals("START")) {
                 this.modeActuatorDescriptor.modePause();
@@ -112,6 +111,7 @@ public class ModeActuatorResource extends CoapResource {
     // behaviour to PUT function
     @Override
     public void handlePUT(CoapExchange exchange) {
+
         try {
             String receivedPayload = new String(exchange.getRequestPayload());
             MakeModeRequest makeModeRequest = this.gson.fromJson(receivedPayload, MakeModeRequest.class);

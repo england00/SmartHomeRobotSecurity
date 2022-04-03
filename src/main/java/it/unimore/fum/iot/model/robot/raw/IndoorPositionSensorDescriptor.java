@@ -1,4 +1,6 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.robot.raw;
+
+import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -20,17 +22,20 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
     // utility variables
     private final transient Random random; // this variable mustn't be serialized
     private final double[] roomDimensions; // 2 values array
+    private final double[] origin; // offset from the robot begin
     private static final double SPEED = 0.0005; // 50 cm/s
     private double[] chargerPosition;
     private boolean returnFlag = false;
 
-    public IndoorPositionSensorDescriptor(String robotId, Number version, double[] roomDimensions) {
+    public IndoorPositionSensorDescriptor(String robotId, Number version, double[] roomDimensions, double[] origin) {
         this.robotId = robotId;
         this.version = version;
         this.random = new Random();
         this.roomDimensions = roomDimensions;
+        this.origin = origin;
     }
 
+    @Override
     public String getRobotId() {
         return robotId;
     }
@@ -39,6 +44,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.robotId = robotId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -47,6 +53,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -55,6 +62,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.version = version;
     }
 
+    @Override
     public double[] getPosition() {
         return position;
     }
@@ -63,6 +71,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         this.position = position;
     }
 
+    @Override
     public String getUnit() {
         return unit;
     }
@@ -75,10 +84,21 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         return random;
     }
 
+    @Override
+    public double[] getRoomDimensions() {
+        return roomDimensions;
+    }
+
+    @Override
+    public double[] getOrigin() {
+        return origin;
+    }
+
     public double[] getChargerPosition() {
         return chargerPosition;
     }
 
+    @Override
     // set by the RETURN HOME ACTUATOR
     public void setChargerPosition(double[] chargerPosition) {
         this.chargerPosition = chargerPosition;
@@ -88,6 +108,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
         return returnFlag;
     }
 
+    @Override
     // set by the RETURN HOME ACTUATOR
     public void setReturnFlag(boolean returnFlag) {
         this.returnFlag = returnFlag;
@@ -116,7 +137,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
                 } else {
                     this.position[0] += this.random.nextDouble(distance);
                 }
-                if (this.position[0] < this.roomDimensions[0] && this.position[0] > 0) {
+                if (this.position[0] < (this.roomDimensions[0] + this.origin[0]) && this.position[0] > this.origin[0]) {
                     control = true;
                 }
             }
@@ -129,7 +150,7 @@ public class IndoorPositionSensorDescriptor implements IIndoorPositionSensorDesc
                 } else {
                     this.position[1] += this.random.nextDouble(distance);
                 }
-                if (this.position[1] < this.roomDimensions[1] && this.position[1] > 0) {
+                if (this.position[1] < (this.roomDimensions[1] + this.origin[1]) && this.position[1] > this.origin[1]) {
                     control = false;
                 }
             }

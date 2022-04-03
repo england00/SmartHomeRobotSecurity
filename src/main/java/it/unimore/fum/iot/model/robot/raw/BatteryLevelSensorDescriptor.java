@@ -1,4 +1,6 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.robot.raw;
+
+import it.unimore.fum.iot.model.robot.IBatteryLevelSensorDescriptor;
 
 import java.util.Random;
 
@@ -7,7 +9,7 @@ import java.util.Random;
  * @project SMART-HOME-robot-security
  * @created 13/03/2022 - 18:19
  */
-public class BatteryLevelSensorDescriptor {
+public class BatteryLevelSensorDescriptor implements IBatteryLevelSensorDescriptor {
 
     // sensor's parameters
     private String robotId;
@@ -25,6 +27,7 @@ public class BatteryLevelSensorDescriptor {
         this.random = new Random();
     }
 
+    @Override
     public String getRobotId() {
         return robotId;
     }
@@ -33,6 +36,7 @@ public class BatteryLevelSensorDescriptor {
         this.robotId = robotId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -41,6 +45,7 @@ public class BatteryLevelSensorDescriptor {
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -49,15 +54,18 @@ public class BatteryLevelSensorDescriptor {
         this.version = version;
     }
 
+    @Override
     public double getBatteryLevel() {
         return batteryLevel;
     }
 
+    @Override
     // reset on 100.0 by the CHARGING STATION
     public void setBatteryLevel(double batteryLevel) {
         this.batteryLevel = batteryLevel;
     }
 
+    @Override
     public String getUnit() {
         return unit;
     }
@@ -66,6 +74,7 @@ public class BatteryLevelSensorDescriptor {
         this.unit = unit;
     }
 
+    @Override
     public void checkBatteryLevel(){
         // managing battery values
         this.batteryLevel = this.batteryLevel - (this.random.nextDouble() * 5.0);

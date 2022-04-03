@@ -20,24 +20,16 @@ public class RobotResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "Robot";
     private Gson gson;
-    private RobotDescriptor robotDescriptor;
-    private String robotId = null;
-    private String room = null;
-    private Number softwareVersion = null;
-    private String manufacturer = null;
+    private final RobotDescriptor robotDescriptor;
 
-    public RobotResource(String name, String robotId, String room, Number softwareVersion, String manufacturer) {
+    public RobotResource(String name, RobotDescriptor robotDescriptor) {
         super(name);
-        this.robotId = robotId;
-        this.room = room;
-        this.softwareVersion = softwareVersion;
-        this.manufacturer = manufacturer;
+        this.robotDescriptor = robotDescriptor;
         init();
     }
 
     private void init(){
         this.gson = new Gson();
-        this.robotDescriptor = new RobotDescriptor(this.robotId, this.room, this.softwareVersion, this.manufacturer);
 
         getAttributes().setTitle(OBJECT_TITLE);
         getAttributes().addAttribute("rt", "it.unimore.robot.descriptor");
@@ -54,17 +46,17 @@ public class RobotResource extends CoapResource {
 
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
-            senMLRecord1.setN(this.robotId);
+            senMLRecord1.setN(this.robotDescriptor.getRobotId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
-            senMLRecord2.setN(this.room);
+            senMLRecord2.setN(this.robotDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
             senMLRecord3.setN("softwareVersion");
-            senMLRecord3.setV(this.softwareVersion);
+            senMLRecord3.setV(this.robotDescriptor.getSoftwareVersion());
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
-            senMLRecord4.setN(this.manufacturer);
+            senMLRecord4.setN(this.robotDescriptor.getManufacturer());
 
             senMLPack.add(senMLRecord1);
             senMLPack.add(senMLRecord2);
@@ -81,6 +73,7 @@ public class RobotResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||

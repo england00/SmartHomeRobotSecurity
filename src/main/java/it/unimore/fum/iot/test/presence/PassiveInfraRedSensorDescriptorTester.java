@@ -1,7 +1,6 @@
 package it.unimore.fum.iot.test.presence;
 
 import it.unimore.fum.iot.model.presence.PassiveInfraRedSensorDescriptor;
-import it.unimore.fum.iot.model.robot.PresenceInCameraStreamSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
