@@ -1,6 +1,7 @@
 package it.unimore.fum.iot.test.presence;
 
-import it.unimore.fum.iot.model.presence.PassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.model.presence.raw.PassiveInfraRedSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -14,7 +15,7 @@ public class PassiveInfraRedSensorDescriptorTester {
         System.out.println("Testing PIR Sensor ...");
 
         // requesting PIR signal
-        PassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor("presence-monitoring-0001", 0.1);
+        IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor("presence-monitoring-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {

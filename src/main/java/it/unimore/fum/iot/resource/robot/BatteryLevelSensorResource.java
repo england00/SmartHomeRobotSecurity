@@ -55,8 +55,8 @@ public class BatteryLevelSensorResource extends CoapResource{
             senMLRecord.setN("battery");
             senMLRecord.setT(this.batteryLevelSensorDescriptor.getTimestamp());
             senMLRecord.setBver(this.batteryLevelSensorDescriptor.getVersion());
-            senMLRecord.setBu(UNIT);
             senMLRecord.setV(this.batteryLevelSensorDescriptor.getBatteryLevel());
+            senMLRecord.setBu(UNIT);
 
             senMLPack.add(senMLRecord);
 

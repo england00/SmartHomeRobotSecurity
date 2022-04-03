@@ -1,6 +1,7 @@
 package it.unimore.fum.iot.test.charger;
 
-import it.unimore.fum.iot.model.charger.EnergyConsumptionSensorDescriptor;
+import it.unimore.fum.iot.model.charger.IEnergyConsumptionSensorDescriptor;
+import it.unimore.fum.iot.model.charger.raw.EnergyConsumptionSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -14,7 +15,7 @@ public class EnergyConsumptionSensorDescriptorTester {
         System.out.println("Testing Battery Level Sensor ...");
 
         // requesting energy consumption
-        EnergyConsumptionSensorDescriptor energyConsumptionSensorDescriptor = new EnergyConsumptionSensorDescriptor();
+        IEnergyConsumptionSensorDescriptor energyConsumptionSensorDescriptor = new EnergyConsumptionSensorDescriptor("charger-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {
@@ -30,4 +31,3 @@ public class EnergyConsumptionSensorDescriptorTester {
         }
     }
 }
-

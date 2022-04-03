@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.presence;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.presence.PassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -19,21 +19,18 @@ import java.util.Optional;
  */
 public class PassiveInfraRedSensorResource extends CoapResource {
 
-    private static final String OBJECT_TITLE = "PresenceInCameraStreamSensor";
+    private static final String OBJECT_TITLE = "PassiveInfraRedSensor";
     private Gson gson;
-    private PassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor;
-    private String presenceId = null;
-    private static final Number SENSOR_VERSION = 0.1;
+    private final IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor;
 
-    public PassiveInfraRedSensorResource(String name, String presenceId) {
+    public PassiveInfraRedSensorResource(String name, IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor) {
         super(name);
-        this.presenceId = presenceId;
+        this.passiveInfraRedSensorDescriptor = passiveInfraRedSensorDescriptor;
         init();
     }
 
     private void init() {
         this.gson = new Gson();
-        this.passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor(this.presenceId, SENSOR_VERSION);
 
         // enable observing and configure notification type
         setObservable(true);
@@ -53,10 +50,10 @@ public class PassiveInfraRedSensorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.presenceId);
+            senMLRecord.setBn(this.passiveInfraRedSensorDescriptor.getPresenceId());
             senMLRecord.setN("pir");
             senMLRecord.setT(this.passiveInfraRedSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(SENSOR_VERSION);
+            senMLRecord.setBver(this.passiveInfraRedSensorDescriptor.getVersion());
             senMLRecord.setVb(this.passiveInfraRedSensorDescriptor.isValue());
 
             senMLPack.add(senMLRecord);

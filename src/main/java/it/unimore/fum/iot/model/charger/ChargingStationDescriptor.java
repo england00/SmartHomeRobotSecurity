@@ -12,18 +12,19 @@ public class ChargingStationDescriptor {
     // object's parameters
     private String chargerId;
     private String room;
-    private double[] position = new double[2];
-    private String softwareVersion;
+    private Number softwareVersion;
     private String manufacturer;
+    private double[] position = new double[2];
+    private String unit = "meter";
 
     public ChargingStationDescriptor() {}
 
-    public ChargingStationDescriptor(String chargerId, String room, double[] position, String softwareVersion, String manufacturer) {
+    public ChargingStationDescriptor(String chargerId, String room, Number softwareVersion, String manufacturer, double[] position) {
         this.chargerId = chargerId;
         this.room = room;
-        this.position = position;
         this.softwareVersion = softwareVersion;
         this.manufacturer = manufacturer;
+        this.position = position;
     }
 
     public String getChargerId() {
@@ -42,19 +43,11 @@ public class ChargingStationDescriptor {
         this.room = room;
     }
 
-    public double[] getPosition() {
-        return position;
-    }
-
-    public void setPosition(double[] position) {
-        this.position = position;
-    }
-
-    public String getSoftwareVersion() {
+    public Number getSoftwareVersion() {
         return softwareVersion;
     }
 
-    public void setSoftwareVersion(String softwareVersion) {
+    public void setSoftwareVersion(Number softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
 
@@ -66,14 +59,31 @@ public class ChargingStationDescriptor {
         this.manufacturer = manufacturer;
     }
 
+    public double[] getPosition() {
+        return position;
+    }
+
+    public void setPosition(double[] position) {
+        this.position = position;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ChargingStationDescriptor{");
         sb.append("chargerId='").append(chargerId).append('\'');
         sb.append(", room='").append(room).append('\'');
-        sb.append(", position=").append(Arrays.toString(position));
+        sb.append(", softwareVersion=").append(softwareVersion);
         sb.append(", manufacturer='").append(manufacturer).append('\'');
-        sb.append(", softwareVersion='").append(softwareVersion).append('\'');
+        sb.append(", position=").append(Arrays.toString(position));
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -21,7 +21,6 @@ public class RobotCoapProcess extends CoapServer {
 
     private final static Logger logger = LoggerFactory.getLogger(RobotCoapProcess.class);
 
-
     public RobotCoapProcess() throws RoomsManagerException, RoomsManagerConflict {
 
         super();
@@ -36,7 +35,6 @@ public class RobotCoapProcess extends CoapServer {
         // resources creation
         ResourcesCreation(roomDescriptor, robotDescriptor);
     }
-
 
     private RoomDescriptor Room() throws RoomsManagerException {
 
@@ -59,7 +57,6 @@ public class RobotCoapProcess extends CoapServer {
         return roomDescriptor;
     }
 
-
     private void ResourcesCreation(RoomDescriptor roomDescriptor, RobotDescriptor robotDescriptor) {
 
         // init emulated physical sensors and actuators
@@ -74,16 +71,15 @@ public class RobotCoapProcess extends CoapServer {
         this.add(new RobotResource("descriptor", robotDescriptor));
 
         // sensors
-        this.add(new BatteryLevelSensorResource("battery", batteryLevelSensorDescriptor));
-        this.add(new IndoorPositionSensorResource("position", indoorPositionSensorDescriptor));
-        this.add(new PresenceInCameraStreamSensorResource("presence", presenceInCameraStreamSensorDescriptor));
+        this.add(new BatteryLevelSensorResource("sensor/battery", batteryLevelSensorDescriptor));
+        this.add(new IndoorPositionSensorResource("sensor/position", indoorPositionSensorDescriptor));
+        this.add(new PresenceInCameraStreamSensorResource("sensor/presence", presenceInCameraStreamSensorDescriptor));
 
         // actuators
-        this.add(new CameraSwitchActuatorResource("camera", cameraSwitchActuatorDescriptor));
-        this.add(new ModeActuatorResource("mode", modeActuatorDescriptor));
-        this.add(new ReturnHomeActuatorResource("home", returnHomeActuatorDescriptor));
+        this.add(new CameraSwitchActuatorResource("actuator/camera", cameraSwitchActuatorDescriptor));
+        this.add(new ModeActuatorResource("actuator/mode", modeActuatorDescriptor));
+        this.add(new ReturnHomeActuatorResource("actuator/home", returnHomeActuatorDescriptor));
     }
-
 
     public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {
 

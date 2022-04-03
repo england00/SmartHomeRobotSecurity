@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.test.robot;
 
+import it.unimore.fum.iot.model.robot.IPresenceInCameraStreamSensorDescriptor;
 import it.unimore.fum.iot.model.robot.raw.PresenceInCameraStreamSensorDescriptor;
 
 /**
@@ -14,7 +15,7 @@ public class PresenceInCameraStreamSensorDescriptorTester {
         System.out.println("Testing Presence In Camera Stream Sensor ...");
 
         // requesting
-        PresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor = new PresenceInCameraStreamSensorDescriptor("robot-0001", 0.1);
+        IPresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor = new PresenceInCameraStreamSensorDescriptor("robot-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {

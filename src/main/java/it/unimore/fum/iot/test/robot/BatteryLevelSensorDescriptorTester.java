@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.test.robot;
 
+import it.unimore.fum.iot.model.robot.IBatteryLevelSensorDescriptor;
 import it.unimore.fum.iot.model.robot.raw.BatteryLevelSensorDescriptor;
 
 /**
@@ -14,7 +15,7 @@ public class BatteryLevelSensorDescriptorTester {
         System.out.println("Testing Battery Level Sensor ...");
 
         // requesting battery level
-        BatteryLevelSensorDescriptor batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor("robot-0001", 0.1);
+        IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor("robot-0001", 0.1);
 
         int control;
         for (control = 0; control < 1000; control++) {

@@ -57,12 +57,12 @@ public class IndoorPositionSensorResource extends CoapResource {
             senMLRecord.setBver(this.indoorPositionSensorDescriptor.getVersion());
 
             SenMLRecord measureRecordX = new SenMLRecord();
-            senMLRecord.setU("X");
+            senMLRecord.setN("X");
             senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[0]);
             senMLRecord.setU(UNIT);
 
             SenMLRecord measureRecordY = new SenMLRecord();
-            senMLRecord.setU("Y");
+            senMLRecord.setN("Y");
             senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[1]);
             senMLRecord.setU(UNIT);
 

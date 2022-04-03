@@ -1,4 +1,6 @@
-package it.unimore.fum.iot.model.presence;
+package it.unimore.fum.iot.model.presence.raw;
+
+import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
 
 import java.util.Random;
 
@@ -7,7 +9,7 @@ import java.util.Random;
  * @project SMART-HOME-robot-security
  * @created 15/03/2022 - 12:51
  */
-public class PassiveInfraRedSensorDescriptor {
+public class PassiveInfraRedSensorDescriptor implements IPassiveInfraRedSensorDescriptor {
 
     // sensor's parameters
     private String presenceId;
@@ -24,6 +26,7 @@ public class PassiveInfraRedSensorDescriptor {
         this.random = new Random();
     }
 
+    @Override
     public String getPresenceId() {
         return presenceId;
     }
@@ -32,6 +35,7 @@ public class PassiveInfraRedSensorDescriptor {
         this.presenceId = presenceId;
     }
 
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -40,6 +44,7 @@ public class PassiveInfraRedSensorDescriptor {
         this.timestamp = timestamp;
     }
 
+    @Override
     public Number getVersion() {
         return version;
     }
@@ -48,6 +53,7 @@ public class PassiveInfraRedSensorDescriptor {
         this.version = version;
     }
 
+    @Override
     public boolean isValue() {
         return value;
     }
@@ -56,6 +62,7 @@ public class PassiveInfraRedSensorDescriptor {
         this.value = value;
     }
 
+    @Override
     public void checkPassiveInfraRedSensorDescriptor(){
         // managing value
         int num = this.random.nextInt(10);

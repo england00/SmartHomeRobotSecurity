@@ -54,12 +54,12 @@ public class ReturnHomeActuatorResource extends CoapResource {
             senMLRecord.setVb(this.returnHomeActuatorDescriptor.isValue());
 
             SenMLRecord measureRecordX = new SenMLRecord();
-            senMLRecord.setU("X");
+            senMLRecord.setN("X");
             senMLRecord.setV(this.returnHomeActuatorDescriptor.getChargerPosition()[0]);
             senMLRecord.setU(UNIT);
 
             SenMLRecord measureRecordY = new SenMLRecord();
-            senMLRecord.setU("Y");
+            senMLRecord.setN("Y");
             senMLRecord.setV(this.returnHomeActuatorDescriptor.getChargerPosition()[1]);
             senMLRecord.setU(UNIT);
 

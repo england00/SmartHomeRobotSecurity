@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.test.robot;
 
+import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
 import it.unimore.fum.iot.model.robot.raw.CameraSwitchActuatorDescriptor;
 
 /**
@@ -14,7 +15,7 @@ public class CameraSwitchActuatorDescriptorTester {
         System.out.println("Testing Camera Switch Actuator ...");
 
         // requesting
-        CameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor();
+        ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor();
 
         int control;
         for (control = 0; control < 1000; control++) {

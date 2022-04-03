@@ -1,6 +1,7 @@
 package it.unimore.fum.iot.test.robot;
 
 import it.unimore.fum.iot.model.home.RoomDescriptor;
+import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
 import it.unimore.fum.iot.model.robot.raw.IndoorPositionSensorDescriptor;
 
 /**
@@ -19,7 +20,7 @@ public class IndoorPositionSensorDescriptorTester {
 
         // requesting position
         // IIndoorPositionSensorDescriptor iIndoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(new double[]{3.0, 4.0});
-        IndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor("robot-0001", 0.1, roomDescriptor.getDimensions(), roomDescriptor.getOrigin());
+        IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor("robot-0001", 0.1, roomDescriptor.getDimensions(), roomDescriptor.getOrigin());
 
         int control;
         for (control = 0; control < 1000; control++) {
