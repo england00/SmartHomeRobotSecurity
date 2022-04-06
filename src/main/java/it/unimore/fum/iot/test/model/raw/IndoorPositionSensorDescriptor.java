@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.test.model.IIndoorPositionSensorDescriptor;
 
 import java.util.Arrays;
 import java.util.Random;

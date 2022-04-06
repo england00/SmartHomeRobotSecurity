@@ -1,7 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.IBatteryLevelSensorDescriptor;
+import it.unimore.fum.iot.model.robot.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.robot.GeneralDataListener;
+import it.unimore.fum.iot.model.robot.GeneralDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -10,6 +12,8 @@ import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -19,15 +23,29 @@ import java.util.Optional;
  */
 public class BatteryLevelSensorResource extends CoapResource{
 
+    private final static Logger logger = LoggerFactory.getLogger(BatteryLevelSensorResource.class);
     private static final String OBJECT_TITLE = "BatteryLevelSensor";
     private Gson gson;
-    private final IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor;
+    private final BatteryLevelRawSensor batteryLevelRawSensor;
     private static final String UNIT = "%EL";
 
-    public BatteryLevelSensorResource(String name, IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor) {
+    public BatteryLevelSensorResource(String name, BatteryLevelRawSensor batteryLevelRawSensor) {
         super(name);
-        this.batteryLevelSensorDescriptor = batteryLevelSensorDescriptor;
-        init();
+        this.batteryLevelRawSensor = batteryLevelRawSensor;
+
+        if (batteryLevelRawSensor != null && batteryLevelRawSensor.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
+
+        assert this.batteryLevelRawSensor != null;
+        this.batteryLevelRawSensor.addDataListener(new GeneralDataListener<Double>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<Double> resource, Double updatedValue) {
+                changed();
+            }
+        });
     }
 
     private void init(){
@@ -38,6 +56,7 @@ public class BatteryLevelSensorResource extends CoapResource{
         setObserveType(Type.CON);
 
         getAttributes().setTitle(OBJECT_TITLE);
+        getAttributes().setObservable();
         getAttributes().addAttribute("rt", "it.unimore.robot.sensor.battery");
         getAttributes().addAttribute("if", CoreInterfaces.CORE_S.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
@@ -51,11 +70,11 @@ public class BatteryLevelSensorResource extends CoapResource{
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.batteryLevelSensorDescriptor.getRobotId());
+            senMLRecord.setBn(this.batteryLevelRawSensor.getUuid());
             senMLRecord.setN("battery");
-            senMLRecord.setT(this.batteryLevelSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(this.batteryLevelSensorDescriptor.getVersion());
-            senMLRecord.setV(this.batteryLevelSensorDescriptor.getBatteryLevel());
+            senMLRecord.setT(this.batteryLevelRawSensor.getTimestamp());
+            senMLRecord.setBver(this.batteryLevelRawSensor.getVersion());
+            senMLRecord.setV(this.batteryLevelRawSensor.getBatteryLevel());
             senMLRecord.setBu(UNIT);
 
             senMLPack.add(senMLRecord);
@@ -72,7 +91,8 @@ public class BatteryLevelSensorResource extends CoapResource{
     public void handleGET(CoapExchange exchange) {
 
         try {
-            this.batteryLevelSensorDescriptor.checkBatteryLevel();
+            // the Max-Age value should match the update interval
+            exchange.setMaxAge(BatteryLevelRawSensor.UPDATE_PERIOD);
 
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -85,9 +105,10 @@ public class BatteryLevelSensorResource extends CoapResource{
                 else
                     exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
             } else
-                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.batteryLevelSensorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
+                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.batteryLevelRawSensor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         } catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

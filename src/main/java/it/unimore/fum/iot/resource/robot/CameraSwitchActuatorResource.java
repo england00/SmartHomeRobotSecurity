@@ -1,7 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.GeneralDataListener;
+import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.robot.raw.SwitchRawActuator;
 import it.unimore.fum.iot.request.MakeCameraSwitchRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -10,6 +12,9 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
 
 /**
@@ -19,14 +24,20 @@ import java.util.Optional;
  */
 public class CameraSwitchActuatorResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(CameraSwitchActuatorResource.class);
     private static final String OBJECT_TITLE = "CameraSwitchActuator";
     private Gson gson;
-    private final ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor;
+    private final SwitchRawActuator switchRawActuator;
 
-    public CameraSwitchActuatorResource (String name, ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor) {
+    public CameraSwitchActuatorResource (String name, SwitchRawActuator switchRawActuator) {
         super(name);
-        this.cameraSwitchActuatorDescriptor = cameraSwitchActuatorDescriptor;
-        init();
+        this.switchRawActuator = switchRawActuator;
+
+        if (switchRawActuator != null && switchRawActuator.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
     }
 
     public void init() {
@@ -37,6 +48,14 @@ public class CameraSwitchActuatorResource extends CoapResource {
         getAttributes().addAttribute("if", CoreInterfaces.CORE_A.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.TEXT_PLAIN));
+
+        switchRawActuator.addDataListener(new GeneralDataListener<Boolean>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
+                logger.info("Raw Resource Notification Callback ! New Value: {}", updatedValue);
+                changed();
+            }
+        });
     }
 
     private Optional<String> getJsonSenmlResponse(){
@@ -46,11 +65,11 @@ public class CameraSwitchActuatorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.cameraSwitchActuatorDescriptor.getRobotId());
+            senMLRecord.setBn(this.switchRawActuator.getUuid());
             senMLRecord.setN("camera");
-            senMLRecord.setT(this.cameraSwitchActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(this.cameraSwitchActuatorDescriptor.getVersion());
-            senMLRecord.setVb(this.cameraSwitchActuatorDescriptor.isValue());
+            senMLRecord.setT(this.switchRawActuator.getTimestamp());
+            senMLRecord.setBver(this.switchRawActuator.getVersion());
+            senMLRecord.setVb(this.switchRawActuator.isValue());
 
             senMLPack.add(senMLRecord);
 
@@ -77,9 +96,10 @@ public class CameraSwitchActuatorResource extends CoapResource {
                 else
                     exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
             } else
-                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.cameraSwitchActuatorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
+                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.switchRawActuator.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         } catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -89,16 +109,17 @@ public class CameraSwitchActuatorResource extends CoapResource {
     public void handlePOST(CoapExchange exchange) {
 
         try {
-            if (this.cameraSwitchActuatorDescriptor.isValue()) {
-                this.cameraSwitchActuatorDescriptor.switchStatusOff();
+            if (this.switchRawActuator.isValue()) {
+                this.switchRawActuator.switchStatusOff();
             } else {
-                this.cameraSwitchActuatorDescriptor.switchStatusOn();
+                this.switchRawActuator.switchStatusOn();
             }
-
+            logger.info("Resource Status Updated: {}", this.switchRawActuator.isValue());
             exchange.respond(ResponseCode.CHANGED);
             changed();
 
         } catch (Exception e){
+            logger.error("Error Handling POST -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -113,11 +134,13 @@ public class CameraSwitchActuatorResource extends CoapResource {
 
             if (makeCameraSwitchRequest != null && makeCameraSwitchRequest.getType() != null && makeCameraSwitchRequest.getType().length() > 0) {
                 if (makeCameraSwitchRequest.getType().equals(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)) {
-                    this.cameraSwitchActuatorDescriptor.switchStatusOn();
+                    this.switchRawActuator.switchStatusOn();
+                    logger.info("Resource Status Updated: {}", this.switchRawActuator.isValue());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
                 } else if(makeCameraSwitchRequest.getType().equals(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)){
-                    this.cameraSwitchActuatorDescriptor.switchStatusOff();
+                    this.switchRawActuator.switchStatusOff();
+                    logger.info("Resource Status Updated: {}", this.switchRawActuator.isValue());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
                 } else
@@ -127,6 +150,7 @@ public class CameraSwitchActuatorResource extends CoapResource {
                 exchange.respond(ResponseCode.BAD_REQUEST);
 
         } catch (Exception e){
+            logger.error("Error Handling PUT -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

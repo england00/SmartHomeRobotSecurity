@@ -2,7 +2,7 @@ package it.unimore.fum.iot.server;
 
 import it.unimore.fum.iot.exception.*;
 import it.unimore.fum.iot.model.home.RoomDescriptor;
-import it.unimore.fum.iot.model.robot.*;
+import it.unimore.fum.iot.model.robot.RobotDescriptor;
 import it.unimore.fum.iot.model.robot.raw.*;
 import it.unimore.fum.iot.persistence.IRoomsManager;
 import it.unimore.fum.iot.persistence.RoomsManager;
@@ -31,20 +31,21 @@ public class RobotCoapProcess extends CoapServer {
 
         // object
         RobotDescriptor robotDescriptor = new RobotDescriptor(robotId, roomDescriptor.getRoom(), 5.0, "Phillips");
+        logger.info(String.valueOf(robotDescriptor));
 
         // resources creation
         ResourcesCreation(roomDescriptor, robotDescriptor);
     }
 
-    private RoomDescriptor Room() throws RoomsManagerException {
+    private RoomDescriptor Room() throws RoomsManagerException, RoomsManagerConflict {
 
         // take existing room from file
         IRoomsManager roomsManager = new RoomsManager();
         RoomDescriptor roomDescriptor = roomsManager.getRoom("home"); // take data from file
 
         // create a new room
-        // RoomDescriptor roomDescriptor = new RoomDescriptor("living-room", new double[] {3.0, 4.0}, new double[] {1.5, 2.0});
-        // roomsManager.createNewRoom(roomDescriptor);
+        //roomDescriptor = new RoomDescriptor("home", new double[] {15.0, 20.0}, new double[] {0.0, 0.0});
+        //roomsManager.createNewRoom(roomDescriptor);
 
         // update an existing room
         // RoomDescriptor roomDescriptor = new RoomDescriptor("home", new double[] {3.0, 4.0}, new double[] {1.5, 2.0});
@@ -60,25 +61,25 @@ public class RobotCoapProcess extends CoapServer {
     private void ResourcesCreation(RoomDescriptor roomDescriptor, RobotDescriptor robotDescriptor) {
 
         // init emulated physical sensors and actuators
-        IBatteryLevelSensorDescriptor batteryLevelSensorDescriptor = new BatteryLevelSensorDescriptor(robotDescriptor.getRobotId(), 0.1);
-        IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor = new IndoorPositionSensorDescriptor(robotDescriptor.getRobotId(), 0.1, roomDescriptor.getDimensions(), roomDescriptor.getOrigin());
-        IPresenceInCameraStreamSensorDescriptor presenceInCameraStreamSensorDescriptor = new PresenceInCameraStreamSensorDescriptor(robotDescriptor.getRobotId(), 0.1);
-        ICameraSwitchActuatorDescriptor cameraSwitchActuatorDescriptor = new CameraSwitchActuatorDescriptor(robotDescriptor.getRobotId(), 0.1);
-        IModeActuatorDescriptor modeActuatorDescriptor = new ModeActuatorDescriptor(robotDescriptor.getRobotId(), 0.1);
-        IReturnHomeActuatorDescriptor returnHomeActuatorDescriptor = new ReturnHomeActuatorDescriptor(robotDescriptor.getRobotId(), 0.1);
+        BatteryLevelRawSensor robotBatteryLevelSensor = new BatteryLevelRawSensor(robotDescriptor.getRobotId(), 0.1);
+        IndoorPositionRawSensor robotIndoorPositionSensor = new IndoorPositionRawSensor(robotDescriptor.getRobotId(), 0.1, roomDescriptor.getDimensions(), roomDescriptor.getOrigin());
+        PresenceRawSensor robotPresenceInCameraStreamSensor = new PresenceRawSensor(robotDescriptor.getRobotId(), 0.1);
+        SwitchRawActuator robotCameraSwitchActuator = new SwitchRawActuator(robotDescriptor.getRobotId(), 0.1);
+        ModeRawActuator robotModeActuator = new ModeRawActuator(robotDescriptor.getRobotId(), 0.1);
+        ReturnHomeRawActuator robotReturnHomeActuator = new ReturnHomeRawActuator(robotDescriptor.getRobotId(), 0.1);
 
         // descriptor
         this.add(new RobotResource("descriptor", robotDescriptor));
 
         // sensors
-        this.add(new BatteryLevelSensorResource("sensor/battery", batteryLevelSensorDescriptor));
-        this.add(new IndoorPositionSensorResource("sensor/position", indoorPositionSensorDescriptor));
-        this.add(new PresenceInCameraStreamSensorResource("sensor/presence", presenceInCameraStreamSensorDescriptor));
+        this.add(new BatteryLevelSensorResource("battery", robotBatteryLevelSensor));
+        this.add(new IndoorPositionSensorResource("position", robotIndoorPositionSensor));
+        this.add(new PresenceInCameraStreamSensorResource("presence", robotPresenceInCameraStreamSensor));
 
         // actuators
-        this.add(new CameraSwitchActuatorResource("actuator/camera", cameraSwitchActuatorDescriptor));
-        this.add(new ModeActuatorResource("actuator/mode", modeActuatorDescriptor));
-        this.add(new ReturnHomeActuatorResource("actuator/home", returnHomeActuatorDescriptor));
+        this.add(new CameraSwitchActuatorResource("camera", robotCameraSwitchActuator));
+        this.add(new ModeActuatorResource("mode", robotModeActuator));
+        this.add(new ReturnHomeActuatorResource("home", robotReturnHomeActuator));
     }
 
     public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {

@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.test.robot;
 
-import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
-import it.unimore.fum.iot.model.robot.raw.CameraSwitchActuatorDescriptor;
+import it.unimore.fum.iot.test.model.ICameraSwitchActuatorDescriptor;
+import it.unimore.fum.iot.test.model.raw.CameraSwitchActuatorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

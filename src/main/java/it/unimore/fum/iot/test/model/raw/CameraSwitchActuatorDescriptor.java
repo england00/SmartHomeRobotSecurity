@@ -1,8 +1,6 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.robot.ICameraSwitchActuatorDescriptor;
-
-import java.util.Random;
+import it.unimore.fum.iot.test.model.ICameraSwitchActuatorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

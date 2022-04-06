@@ -1,8 +1,12 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.robot.IBatteryLevelSensorDescriptor;
+import it.unimore.fum.iot.test.model.IBatteryLevelSensorDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -15,16 +19,61 @@ public class BatteryLevelSensorDescriptor implements IBatteryLevelSensorDescript
     private String robotId;
     private long timestamp;
     private Number version;
-    private double batteryLevel = 100.0;
+    private double batteryLevel;
     private String unit = "%";
 
     // utility variables
-    private final transient Random random; // this variable mustn't be serialized
+    private transient Random random; // this variable mustn't be serialized
+    private static final Logger logger = LoggerFactory.getLogger(BatteryLevelSensorDescriptor.class);
+
+    // variables associated to data update
+    public static final long UPDATE_PERIOD = 5000;
+    private static final long TASK_DELAY_TIME = 5000;
 
     public BatteryLevelSensorDescriptor(String robotId, Number version) {
         this.robotId = robotId;
         this.version = version;
-        this.random = new Random();
+        init();
+    }
+
+    private void init() {
+
+        try {
+
+            this.random = new Random(System.currentTimeMillis());
+            this.batteryLevel = 100.0;
+            this.timestamp = System.currentTimeMillis();
+
+            startPeriodicEventValueUpdateTask();
+
+        } catch (Exception e){
+            logger.error("Error initializing the IoT Resource! Msg: {}", e.getLocalizedMessage());
+        }
+    }
+
+    private void startPeriodicEventValueUpdateTask(){
+
+        try{
+
+            logger.info("Starting periodic Update Task with Period: {} ms", UPDATE_PERIOD);
+
+            Timer updateTimer = new Timer();
+            updateTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(batteryLevel > 0.0){
+                        batteryLevel = batteryLevel - (random.nextDouble() * 5.0);
+                    } else {
+                        batteryLevel = 0.0;
+                    }
+                }
+            }, TASK_DELAY_TIME, UPDATE_PERIOD);
+
+            this.timestamp = System.currentTimeMillis();
+
+        } catch (Exception e){
+            logger.error("Error executing periodic resource value ! Msg: {}", e.getLocalizedMessage());
+        }
     }
 
     @Override

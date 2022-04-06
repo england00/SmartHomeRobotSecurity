@@ -9,6 +9,8 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -18,6 +20,7 @@ import java.util.Optional;
  */
 public class RobotResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(RobotResource.class);
     private static final String OBJECT_TITLE = "Robot";
     private Gson gson;
     private final RobotDescriptor robotDescriptor;
@@ -46,17 +49,20 @@ public class RobotResource extends CoapResource {
 
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
-            senMLRecord1.setN(this.robotDescriptor.getRobotId());
+            senMLRecord1.setN("robotId");
+            senMLRecord1.setVs(this.robotDescriptor.getRobotId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
-            senMLRecord2.setN(this.robotDescriptor.getRoom());
+            senMLRecord2.setN("room");
+            senMLRecord2.setVs(this.robotDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
             senMLRecord3.setN("softwareVersion");
             senMLRecord3.setV(this.robotDescriptor.getSoftwareVersion());
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
-            senMLRecord4.setN(this.robotDescriptor.getManufacturer());
+            senMLRecord4.setN("manufacturer");
+            senMLRecord4.setVs(this.robotDescriptor.getManufacturer());
 
             senMLPack.add(senMLRecord1);
             senMLPack.add(senMLRecord2);
@@ -89,6 +95,7 @@ public class RobotResource extends CoapResource {
                 exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.robotDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         }  catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

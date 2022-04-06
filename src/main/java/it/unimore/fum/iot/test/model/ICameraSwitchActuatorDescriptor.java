@@ -1,13 +1,13 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.test.model;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 03/04/2022 - 17:35
+ * @created 03/04/2022 - 17:30
  */
-public interface IPresenceInCameraStreamSensorDescriptor {
+public interface ICameraSwitchActuatorDescriptor {
 
-    // Presence In Camera Stream Sensor Interface
+    // Camera Switch Actuator Interface
 
     public String getRobotId();
 
@@ -17,7 +17,9 @@ public interface IPresenceInCameraStreamSensorDescriptor {
 
     public boolean isValue();
 
-    public void checkPresenceInCameraStream();
+    public void switchStatusOn();
+
+    public void switchStatusOff();
 
     @Override
     public String toString();

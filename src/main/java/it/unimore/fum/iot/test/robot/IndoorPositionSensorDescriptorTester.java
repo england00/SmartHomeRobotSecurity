@@ -1,8 +1,8 @@
 package it.unimore.fum.iot.test.robot;
 
 import it.unimore.fum.iot.model.home.RoomDescriptor;
-import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
-import it.unimore.fum.iot.model.robot.raw.IndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.test.model.IIndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.test.model.raw.IndoorPositionSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

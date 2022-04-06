@@ -1,8 +1,13 @@
 package it.unimore.fum.iot.persistence;
 
+import com.google.gson.Gson;
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
 import it.unimore.fum.iot.model.home.RoomDescriptor;
+import it.unimore.fum.iot.server.RobotCoapProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.*;
 
@@ -14,21 +19,15 @@ import java.util.*;
 public class RoomsManager implements IRoomsManager{
 
     // storing all the data in a file through maps and lists
-    private RoomDescriptor roomDescriptor = new RoomDescriptor(null, null, null);
     private final static String filePath = "./src/main/java/it/unimore/fum/iot/persistence/rooms.txt";
     private HashMap<String, RoomDescriptor> roomHashMap;
+    private final static Logger logger = LoggerFactory.getLogger(RoomsManager.class);
+    private final Gson gson;
 
     public RoomsManager() {
         // obtaining the map from file
+        this.gson = new Gson();
         this.roomHashMap = hashMapFromTextFile();
-    }
-
-    public RoomDescriptor getRoomDescriptor() {
-        return roomDescriptor;
-    }
-
-    public void setRoomDescriptor(RoomDescriptor roomDescriptor) {
-        this.roomDescriptor = roomDescriptor;
     }
 
     public HashMap<String, RoomDescriptor> getRoomHashMap() {
@@ -58,22 +57,13 @@ public class RoomsManager implements IRoomsManager{
                 // split the line by ':'
                 String[] identifier = line.split(":");
                 String room = identifier[0].trim();
-
-                // split the line by '='
-                String[] descriptor = line.split("=");
-                this.roomDescriptor.setRoom(descriptor[1].split(",")[0].replace("'","").trim());
-                String dim1 = descriptor[2].split(",")[0].replace("[","").trim();
-                String dim2 = descriptor[2].split(",")[1].split("]")[0].replace(" ","").trim();
-                this.roomDescriptor.setDimensions(new double[] {Double.parseDouble(dim1), Double.parseDouble(dim2)});
-                dim1 = descriptor[3].split(",")[0].replace("[","").trim();
-                dim2 = descriptor[3].split(",")[1].split("]")[0].replace(" ","").trim();
-                this.roomDescriptor.setOrigin(new double[] {Double.parseDouble(dim1), Double.parseDouble(dim2)});
+                RoomDescriptor roomDescriptor = this.gson.fromJson(identifier[1].replace("RoomDescriptor", "").trim(), RoomDescriptor.class);
 
                 // put identificator and object in HashMap if they are not empty
-                if (!room.equals("") && !this.roomDescriptor.getRoom().equals("") &&
-                        this.roomDescriptor.getDimensions() != null &&
-                        this.roomDescriptor.getOrigin() != null)
-                    map.put(room, this.roomDescriptor);
+                if (!room.equals("") && !roomDescriptor.getRoom().equals("") &&
+                        roomDescriptor.getDimensions() != null &&
+                        roomDescriptor.getOrigin() != null)
+                    map.put(room, roomDescriptor);
             }
 
         } catch (Exception e) {

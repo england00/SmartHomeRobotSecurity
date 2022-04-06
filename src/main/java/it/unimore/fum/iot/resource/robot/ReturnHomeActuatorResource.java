@@ -1,7 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.IReturnHomeActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.GeneralDataListener;
+import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.robot.raw.ReturnHomeRawActuator;
 import it.unimore.fum.iot.request.MakeReturnHomeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -10,6 +12,8 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -19,15 +23,21 @@ import java.util.Optional;
  */
 public class ReturnHomeActuatorResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(ReturnHomeActuatorResource.class);
     private static final String OBJECT_TITLE = "ReturnHomeActuator";
     private Gson gson;
-    private final IReturnHomeActuatorDescriptor returnHomeActuatorDescriptor;
+    private final ReturnHomeRawActuator returnHomeRawActuator;
     private static final String UNIT = "m";
 
-    public ReturnHomeActuatorResource(String name, IReturnHomeActuatorDescriptor returnHomeActuatorDescriptor) {
+    public ReturnHomeActuatorResource(String name, ReturnHomeRawActuator returnHomeRawActuator) {
         super(name);
-        this.returnHomeActuatorDescriptor = returnHomeActuatorDescriptor;
-        init();
+        this.returnHomeRawActuator = returnHomeRawActuator;
+
+        if (returnHomeRawActuator != null && returnHomeRawActuator.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
     }
 
     private void init(){
@@ -38,6 +48,14 @@ public class ReturnHomeActuatorResource extends CoapResource {
         getAttributes().addAttribute("if", CoreInterfaces.CORE_A.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.TEXT_PLAIN));
+
+        returnHomeRawActuator.addDataListener(new GeneralDataListener<Boolean>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
+                logger.info("Raw Resource Notification Callback ! New Value: {}", updatedValue);
+                changed();
+            }
+        });
     }
 
     private Optional<String> getJsonSenmlResponse(){
@@ -46,24 +64,26 @@ public class ReturnHomeActuatorResource extends CoapResource {
 
             SenMLPack senMLPack = new SenMLPack();
 
-            SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.returnHomeActuatorDescriptor.getRobotId());
-            senMLRecord.setN("home");
-            senMLRecord.setT(this.returnHomeActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(this.returnHomeActuatorDescriptor.getVersion());
-            senMLRecord.setVb(this.returnHomeActuatorDescriptor.isValue());
+            SenMLRecord baseRecord = new SenMLRecord();
+            baseRecord.setBn(this.returnHomeRawActuator.getUuid());
+            baseRecord.setN("home");
+            baseRecord.setT(this.returnHomeRawActuator.getTimestamp());
+            baseRecord.setBver(this.returnHomeRawActuator.getVersion());
+            baseRecord.setVb(this.returnHomeRawActuator.isValue());
+
+            //if the charger position is null, the senML payload is not sent
 
             SenMLRecord measureRecordX = new SenMLRecord();
-            senMLRecord.setN("X");
-            senMLRecord.setV(this.returnHomeActuatorDescriptor.getChargerPosition()[0]);
-            senMLRecord.setU(UNIT);
+            measureRecordX.setN("X");
+            measureRecordX.setV(this.returnHomeRawActuator.getChargerPosition()[0]);
+            measureRecordX.setU(UNIT);
 
             SenMLRecord measureRecordY = new SenMLRecord();
-            senMLRecord.setN("Y");
-            senMLRecord.setV(this.returnHomeActuatorDescriptor.getChargerPosition()[1]);
-            senMLRecord.setU(UNIT);
+            measureRecordY.setN("Y");
+            measureRecordY.setV(this.returnHomeRawActuator.getChargerPosition()[1]);
+            measureRecordY.setU(UNIT);
 
-            senMLPack.add(senMLRecord);
+            senMLPack.add(baseRecord);
             senMLPack.add(measureRecordX);
             senMLPack.add(measureRecordY);
 
@@ -88,11 +108,13 @@ public class ReturnHomeActuatorResource extends CoapResource {
                 if (senmlPayload.isPresent())
                     exchange.respond(ResponseCode.CONTENT, senmlPayload.get(), exchange.getRequestOptions().getAccept());
                 else
+                    //if the charger position is null, the senML payload is not sent
                     exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
             } else
-                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.returnHomeActuatorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
+                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.returnHomeRawActuator.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         } catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -102,11 +124,13 @@ public class ReturnHomeActuatorResource extends CoapResource {
     public void handlePOST(CoapExchange exchange) {
 
         try {
-            this.returnHomeActuatorDescriptor.switchReturnOff();
-            this.returnHomeActuatorDescriptor.setChargerPosition(null);
+            this.returnHomeRawActuator.switchReturnOff();
+            this.returnHomeRawActuator.setChargerPosition(null);
+            logger.info("Resource Status Updated: {}", this.returnHomeRawActuator.isValue());
             exchange.respond(ResponseCode.CHANGED);
             changed();
         } catch (Exception e){
+            logger.error("Error Handling POST -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -122,13 +146,15 @@ public class ReturnHomeActuatorResource extends CoapResource {
             if (makeReturnHomeRequest != null && makeReturnHomeRequest.getType() != null
                     && makeReturnHomeRequest.getPosition() != null && makeReturnHomeRequest.getType().length() > 0) {
                 if (makeReturnHomeRequest.getType().equals(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME)) {
-                    this.returnHomeActuatorDescriptor.switchReturnOn();
-                    this.returnHomeActuatorDescriptor.setChargerPosition(makeReturnHomeRequest.getPosition());
+                    this.returnHomeRawActuator.switchReturnOn();
+                    this.returnHomeRawActuator.setChargerPosition(makeReturnHomeRequest.getPosition());
+                    logger.info("Resource Status Updated: {}", this.returnHomeRawActuator.isValue());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
                 } else if (makeReturnHomeRequest.getType().equals(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME)) {
-                    this.returnHomeActuatorDescriptor.switchReturnOff();
-                    this.returnHomeActuatorDescriptor.setChargerPosition(null);
+                    this.returnHomeRawActuator.switchReturnOff();
+                    this.returnHomeRawActuator.setChargerPosition(null);
+                    logger.info("Resource Status Updated: {}", this.returnHomeRawActuator.isValue());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
                 } else
@@ -138,6 +164,7 @@ public class ReturnHomeActuatorResource extends CoapResource {
                 exchange.respond(ResponseCode.BAD_REQUEST);
 
         } catch (Exception e){
+            logger.error("Error Handling PUT -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

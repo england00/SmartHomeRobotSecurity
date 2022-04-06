@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.test.robot;
 
-import it.unimore.fum.iot.model.robot.IPresenceInCameraStreamSensorDescriptor;
-import it.unimore.fum.iot.model.robot.raw.PresenceInCameraStreamSensorDescriptor;
+import it.unimore.fum.iot.test.model.IPresenceInCameraStreamSensorDescriptor;
+import it.unimore.fum.iot.test.model.raw.PresenceInCameraStreamSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

@@ -1,25 +1,29 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.robot.IModeActuatorDescriptor;
+import it.unimore.fum.iot.test.model.IPresenceInCameraStreamSensorDescriptor;
+
+import java.util.Random;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 15/03/2022 - 02:45
+ * @created 15/03/2022 - 01:44
  */
-public class ModeActuatorDescriptor implements IModeActuatorDescriptor {
+public class PresenceInCameraStreamSensorDescriptor implements IPresenceInCameraStreamSensorDescriptor {
 
-    // actuator's parameters
+    // sensor's parameters
     private String robotId;
     private long timestamp;
     private Number version;
-    private String value;
+    private boolean value;
 
-    public ModeActuatorDescriptor() {}
+    // utility variables
+    private final transient Random random; // this variable mustn't be serialized
 
-    public ModeActuatorDescriptor(String robotId, Number version) {
+    public PresenceInCameraStreamSensorDescriptor(String robotId, Number version) {
         this.robotId = robotId;
         this.version = version;
+        this.random = new Random();
     }
 
     @Override
@@ -50,36 +54,19 @@ public class ModeActuatorDescriptor implements IModeActuatorDescriptor {
     }
 
     @Override
-    public String getValue() {
+    public boolean isValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(boolean value) {
         this.value = value;
     }
 
     @Override
-    public void modeStart(){
-        // managing mode
-        this.value = "START";
-
-        // managing timestamp
-        this.timestamp = System.currentTimeMillis();
-    }
-
-    @Override
-    public void modePause(){
-        // managing mode
-        this.value = "PAUSE";
-
-        // managing timestamp
-        this.timestamp = System.currentTimeMillis();
-    }
-
-    @Override
-    public void modeStop(){
-        // managing mode
-        this.value = "STOP";
+    public void checkPresenceInCameraStream(){
+        // managing value
+        int num = this.random.nextInt(10);
+        this.value = num == 9; // if num == 9, return true, otherwise is always false
 
         // managing timestamp
         this.timestamp = System.currentTimeMillis();
@@ -87,11 +74,11 @@ public class ModeActuatorDescriptor implements IModeActuatorDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ModeActuatorDescriptor{");
+        final StringBuffer sb = new StringBuffer("PresenceInCameraStreamSensorDescriptor{");
         sb.append("robotId='").append(robotId).append('\'');
         sb.append(", timestamp=").append(timestamp);
         sb.append(", version=").append(version);
-        sb.append(", value='").append(value).append('\'');
+        sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();
     }

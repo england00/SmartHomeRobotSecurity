@@ -1,7 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.IIndoorPositionSensorDescriptor;
+import it.unimore.fum.iot.model.robot.GeneralDataListener;
+import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.robot.raw.IndoorPositionRawSensor;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
 import org.eclipse.californium.core.CoapResource;
@@ -10,6 +12,8 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import it.unimore.fum.iot.utils.CoreInterfaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -19,25 +23,40 @@ import java.util.Optional;
  */
 public class IndoorPositionSensorResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(IndoorPositionSensorResource.class);
     private static final String OBJECT_TITLE = "IndoorPositionSensor";
     private Gson gson;
-    private final IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor;
+    private final IndoorPositionRawSensor indoorPositionRawSensor;
     private static final String UNIT = "m";
 
-    public IndoorPositionSensorResource(String name, IIndoorPositionSensorDescriptor indoorPositionSensorDescriptor) {
+    public IndoorPositionSensorResource(String name, IndoorPositionRawSensor indoorPositionRawSensor) {
         super(name);
-        this.indoorPositionSensorDescriptor = indoorPositionSensorDescriptor;
-        init(this.indoorPositionSensorDescriptor.getRoomDimensions(), this.indoorPositionSensorDescriptor.getOrigin());
+        this.indoorPositionRawSensor = indoorPositionRawSensor;
+
+        if (indoorPositionRawSensor != null && indoorPositionRawSensor.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
+
+        assert this.indoorPositionRawSensor != null;
+        this.indoorPositionRawSensor.addDataListener(new GeneralDataListener<Double[]>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<Double[]> resource, Double[] updatedValue) {
+                changed();
+            }
+        });
     }
 
-    private void init(double[] roomDimensions, double[] origin){
+    private void init(){
         this.gson = new Gson();
 
-        // enable observing
+        // enable observing and configure notification type
         setObservable(true);
         setObserveType(Type.CON);
 
         getAttributes().setTitle(OBJECT_TITLE);
+        getAttributes().setObservable();
         getAttributes().addAttribute("rt", "it.unimore.robot.sensor.position");
         getAttributes().addAttribute("if", CoreInterfaces.CORE_S.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
@@ -50,23 +69,23 @@ public class IndoorPositionSensorResource extends CoapResource {
 
             SenMLPack senMLPack = new SenMLPack();
 
-            SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.indoorPositionSensorDescriptor.getRobotId());
-            senMLRecord.setN("position");
-            senMLRecord.setT(this.indoorPositionSensorDescriptor.getTimestamp());
-            senMLRecord.setBver(this.indoorPositionSensorDescriptor.getVersion());
+            SenMLRecord baseRecord = new SenMLRecord();
+            baseRecord.setBn(this.indoorPositionRawSensor.getUuid());
+            baseRecord.setN("position");
+            baseRecord.setT(this.indoorPositionRawSensor.getTimestamp());
+            baseRecord.setBver(this.indoorPositionRawSensor.getVersion());
 
             SenMLRecord measureRecordX = new SenMLRecord();
-            senMLRecord.setN("X");
-            senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[0]);
-            senMLRecord.setU(UNIT);
+            measureRecordX.setN("X");
+            measureRecordX.setV(this.indoorPositionRawSensor.getPosition()[0]);
+            measureRecordX.setU(UNIT);
 
             SenMLRecord measureRecordY = new SenMLRecord();
-            senMLRecord.setN("Y");
-            senMLRecord.setV(this.indoorPositionSensorDescriptor.getPosition()[1]);
-            senMLRecord.setU(UNIT);
+            measureRecordY.setN("Y");
+            measureRecordY.setV(this.indoorPositionRawSensor.getPosition()[1]);
+            measureRecordY.setU(UNIT);
 
-            senMLPack.add(senMLRecord);
+            senMLPack.add(baseRecord);
             senMLPack.add(measureRecordX);
             senMLPack.add(measureRecordY);
 
@@ -82,7 +101,8 @@ public class IndoorPositionSensorResource extends CoapResource {
     public void handleGET(CoapExchange exchange) {
 
         try {
-            this.indoorPositionSensorDescriptor.updateIndoorPosition();
+            // the Max-Age value should match the update interval
+            exchange.setMaxAge(IndoorPositionRawSensor.UPDATE_PERIOD);
 
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -95,9 +115,10 @@ public class IndoorPositionSensorResource extends CoapResource {
                 else
                     exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
             } else
-                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.indoorPositionSensorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
+                exchange.respond(ResponseCode.CONTENT, String.valueOf(this.indoorPositionRawSensor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         } catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

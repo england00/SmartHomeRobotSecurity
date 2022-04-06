@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.test.model;
 
 import java.util.Arrays;
 import java.util.Random;

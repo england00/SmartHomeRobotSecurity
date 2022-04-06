@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.robot.IReturnHomeActuatorDescriptor;
+import it.unimore.fum.iot.test.model.IReturnHomeActuatorDescriptor;
 
 import java.util.Arrays;
 

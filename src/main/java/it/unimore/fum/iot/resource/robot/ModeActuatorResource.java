@@ -1,7 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.IModeActuatorDescriptor;
+import it.unimore.fum.iot.model.robot.GeneralDataListener;
+import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.robot.raw.ModeRawActuator;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
@@ -10,6 +12,8 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -19,14 +23,20 @@ import java.util.Optional;
  */
 public class ModeActuatorResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(ModeActuatorResource.class);
     private static final String OBJECT_TITLE = "ModeActuator";
     private Gson gson;
-    private final IModeActuatorDescriptor modeActuatorDescriptor;
+    private final ModeRawActuator modeRawActuator;
 
-    public ModeActuatorResource (String name, IModeActuatorDescriptor modeActuatorDescriptor) {
+    public ModeActuatorResource (String name, ModeRawActuator modeRawActuator) {
         super(name);
-        this.modeActuatorDescriptor = modeActuatorDescriptor;
-        init();
+        this.modeRawActuator = modeRawActuator;
+
+        if (modeRawActuator != null && modeRawActuator.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
     }
 
     public void init() {
@@ -37,6 +47,14 @@ public class ModeActuatorResource extends CoapResource {
         getAttributes().addAttribute("if", CoreInterfaces.CORE_A.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.TEXT_PLAIN));
+
+        modeRawActuator.addDataListener(new GeneralDataListener<String>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<String> resource, String updatedValue) {
+                logger.info("Raw Resource Notification Callback ! New Value: {}", updatedValue);
+                changed();
+            }
+        });
     }
 
     private Optional<String> getJsonSenmlResponse(){
@@ -46,11 +64,11 @@ public class ModeActuatorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.modeActuatorDescriptor.getRobotId());
+            senMLRecord.setBn(this.modeRawActuator.getUuid());
             senMLRecord.setN("mode");
-            senMLRecord.setT(this.modeActuatorDescriptor.getTimestamp());
-            senMLRecord.setBver(this.modeActuatorDescriptor.getVersion());
-            senMLRecord.setVs(this.modeActuatorDescriptor.getValue());
+            senMLRecord.setT(this.modeRawActuator.getTimestamp());
+            senMLRecord.setBver(this.modeRawActuator.getVersion());
+            senMLRecord.setVs(this.modeRawActuator.getValue());
 
             senMLPack.add(senMLRecord);
 
@@ -77,7 +95,7 @@ public class ModeActuatorResource extends CoapResource {
                 else
                     exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
             } else
-                exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.modeActuatorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
+                exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.modeRawActuator.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         } catch (Exception e){
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
@@ -89,21 +107,25 @@ public class ModeActuatorResource extends CoapResource {
     public void handlePOST(CoapExchange exchange) {
 
         try {
-            if (this.modeActuatorDescriptor.getValue().equals("START")) {
-                this.modeActuatorDescriptor.modePause();
+            if (this.modeRawActuator.getValue().equals("START")) {
+                this.modeRawActuator.modePause();
+                logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                 exchange.respond(CoAP.ResponseCode.CHANGED);
                 changed();
-            } else if (this.modeActuatorDescriptor.getValue().equals("PAUSE")) {
-                this.modeActuatorDescriptor.modeStart();
+            } else if (this.modeRawActuator.getValue().equals("PAUSE")) {
+                this.modeRawActuator.modeStart();
+                logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                 exchange.respond(CoAP.ResponseCode.CHANGED);
                 changed();
             } else {
-                this.modeActuatorDescriptor.modeStop();
+                this.modeRawActuator.modeStop();
+                logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                 exchange.respond(CoAP.ResponseCode.CHANGED);
                 changed();
             }
 
         } catch (Exception e){
+            logger.error("Error Handling POST -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -119,17 +141,20 @@ public class ModeActuatorResource extends CoapResource {
             if (makeModeRequest != null && makeModeRequest.getType() != null && makeModeRequest.getType().length() > 0) {
                 switch (makeModeRequest.getType()) {
                     case MakeModeRequest.MODE_START -> {
-                        this.modeActuatorDescriptor.modeStart();
+                        this.modeRawActuator.modeStart();
+                        logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                         exchange.respond(CoAP.ResponseCode.CHANGED);
                         changed();
                     }
                     case MakeModeRequest.MODE_PAUSE -> {
-                        this.modeActuatorDescriptor.modePause();
+                        this.modeRawActuator.modePause();
+                        logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                         exchange.respond(CoAP.ResponseCode.CHANGED);
                         changed();
                     }
                     case MakeModeRequest.MODE_STOP -> {
-                        this.modeActuatorDescriptor.modeStop();
+                        this.modeRawActuator.modeStop();
+                        logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
                         exchange.respond(CoAP.ResponseCode.CHANGED);
                         changed();
                     }
@@ -140,6 +165,7 @@ public class ModeActuatorResource extends CoapResource {
                 exchange.respond(CoAP.ResponseCode.BAD_REQUEST);
 
         } catch (Exception e){
+            logger.error("Error Handling PUT -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
