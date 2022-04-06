@@ -3,8 +3,7 @@ package it.unimore.fum.iot.persistence;
 import com.google.gson.Gson;
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.home.RoomDescriptor;
-import it.unimore.fum.iot.server.RobotCoapProcess;
+import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

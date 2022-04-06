@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model.charger;
+package it.unimore.fum.iot.test.model;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

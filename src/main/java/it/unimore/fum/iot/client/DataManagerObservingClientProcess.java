@@ -20,7 +20,13 @@ public class DataManagerObservingClientProcess {
     private static final String ROBOT_BATTERY_LEVEL_SENSOR = "coap://127.0.0.1:5683/battery";
     private static final String ROBOT_INDOOR_POSITION_SENSOR = "coap://127.0.0.1:5683/position";
     private static final String ROBOT_PRESENCE_SENSOR = "coap://127.0.0.1:5683/presence";
-    private static final String ENDPOINT = ROBOT_INDOOR_POSITION_SENSOR;
+
+    private static final String PRESENCE_MONITORING_PIR_SENSOR = "coap://127.0.0.1:5684/pir";
+
+    private static final String CHARGING_ROBOT_BATTERY_LEVEL_SENSOR = "coap://127.0.0.1:5685/recharging_battery";
+    private static final String CHARGING_ENERGY_CONSUMPTION_SENSOR = "coap://127.0.0.1:5685/energy_consumption";
+
+    private static final String ENDPOINT = CHARGING_ENERGY_CONSUMPTION_SENSOR;
 
     public static void main(String[] args) {
 

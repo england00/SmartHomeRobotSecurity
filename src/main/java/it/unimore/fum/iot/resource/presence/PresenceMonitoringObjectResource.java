@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.presence;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.presence.PresenceMonitoringObjectDescriptor;
+import it.unimore.fum.iot.model.descriptor.PresenceMonitoringObjectDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -9,6 +9,9 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
 
 /**
@@ -18,6 +21,7 @@ import java.util.Optional;
  */
 public class PresenceMonitoringObjectResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(PresenceMonitoringObjectResource.class);
     private static final String OBJECT_TITLE = "PresenceMonitoringObject";
     private Gson gson;
     private final PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor;
@@ -46,9 +50,11 @@ public class PresenceMonitoringObjectResource extends CoapResource {
 
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
+            senMLRecord1.setN("presenceId");
             senMLRecord1.setN(this.presenceMonitoringObjectDescriptor.getPresenceId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
+            senMLRecord2.setN("room");
             senMLRecord2.setN(this.presenceMonitoringObjectDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
@@ -56,6 +62,7 @@ public class PresenceMonitoringObjectResource extends CoapResource {
             senMLRecord3.setV(this.presenceMonitoringObjectDescriptor.getSoftwareVersion());
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
+            senMLRecord4.setN("manufacturer");
             senMLRecord4.setN(this.presenceMonitoringObjectDescriptor.getManufacturer());
 
             senMLPack.add(senMLRecord1);
@@ -73,6 +80,7 @@ public class PresenceMonitoringObjectResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -88,6 +96,7 @@ public class PresenceMonitoringObjectResource extends CoapResource {
                 exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.presenceMonitoringObjectDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         }  catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

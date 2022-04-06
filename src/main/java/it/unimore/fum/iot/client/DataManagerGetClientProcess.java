@@ -22,11 +22,18 @@ public class DataManagerGetClientProcess {
 
     // client's parameters
     private final static Logger logger = LoggerFactory.getLogger(DataManagerGetClientProcess.class);
+
     private static final String ROBOT_DESCRIPTOR = "coap://127.0.0.1:5683/descriptor";
     private static final String ROBOT_MODE_ACTUATOR = "coap://127.0.0.1:5683/mode";
     private static final String ROBOT_CAMERA_SWITCH_ACTUATOR = "coap://127.0.0.1:5683/camera";
     private static final String ROBOT_RETURN_HOME_ACTUATOR = "coap://127.0.0.1:5683/home";
-    private static final String ENDPOINT =  ROBOT_RETURN_HOME_ACTUATOR;
+
+    private static final String PRESENCE_MONITORING_DESCRIPTOR = "coap://127.0.0.1:5684/descriptor";
+
+    private static final String CHARGING_STATION_DESCRIPTOR = "coap://127.0.0.1:5685/descriptor";
+    private static final String CHARGING_ROBOT_PRESENCE_SENSOR = "coap://127.0.0.1:5685/robot_presence";
+
+    private static final String ENDPOINT = CHARGING_ROBOT_PRESENCE_SENSOR;
 
     public static void main(String[] args) {
 

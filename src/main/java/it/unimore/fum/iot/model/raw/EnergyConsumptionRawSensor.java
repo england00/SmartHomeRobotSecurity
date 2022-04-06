@@ -1,7 +1,7 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.model.raw;
 
-import it.unimore.fum.iot.model.robot.GeneralDataListener;
-import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Random;
@@ -11,24 +11,33 @@ import java.util.TimerTask;
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 06/04/2022 - 01:02
+ * @created 06/04/2022 - 22:12
  */
-public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
+public class EnergyConsumptionRawSensor extends GeneralDescriptor<Double> {
 
     // sensor's parameters
     private long timestamp;
-    private Boolean value; // Boolean class permits null value
+    private double value;
+    private String unit = "kWh";
 
     // utility variables
-    private boolean activate = true;
     private transient Random random; // this variable mustn't be serialized
-    private static final Logger logger = LoggerFactory.getLogger(PresenceRawSensor.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnergyConsumptionRawSensor.class);
+    private boolean active = true;
 
     // variables associated to data update
     public static final long UPDATE_PERIOD = 5000;
     private static final long TASK_DELAY_TIME = 5000;
 
-    public PresenceRawSensor(String robotId, Number version) {
+    //kWh - kilowatt-hour
+    private static final double MIN_ENERGY_VALUE = 0.5;
+    private static final double MAX_ENERGY_VALUE = 1.0;
+    private static final double MIN_ENERGY_VARIATION = 0.1;
+    private static final double MAX_ENERGY_VARIATION = 0.5;
+    private static final double CAPACITY = 0.7;
+    private static final double RECHARGING_SPEED = 0.003;
+
+    public EnergyConsumptionRawSensor(String robotId, Number version) {
         super(robotId, version);
         init();
     }
@@ -41,20 +50,28 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
         this.timestamp = timestamp;
     }
 
-    public Boolean getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(Boolean value) {
+    public void setValue(double value) {
         this.value = value;
     }
 
-    public boolean isActivate() {
-        return activate;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setActivate(boolean activate) {
-        this.activate = activate;
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     private void init() {
@@ -62,12 +79,14 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
         try {
 
             this.random = new Random(System.currentTimeMillis());
+            this.value = MIN_ENERGY_VALUE + this.random.nextDouble()*(MAX_ENERGY_VALUE - MIN_ENERGY_VALUE);
             this.timestamp = System.currentTimeMillis();
+
 
             startPeriodicEventValueUpdateTask();
 
         } catch (Exception e){
-            logger.error("Error initializing Presence In Camera Stream Sensor! Msg: {}", e.getLocalizedMessage());
+            logger.error("Error initializing Battery Level Sensor! Msg: {}", e.getLocalizedMessage());
         }
     }
 
@@ -81,12 +100,14 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
             updateTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if(isActivate()){
-                        int num = random.nextInt(10);
-                        value = num == 9; // if num == 9, return true, otherwise is always false
+
+                    if(isActive()){
+                        double variation = (MIN_ENERGY_VARIATION + MAX_ENERGY_VARIATION *random.nextDouble()) * (random.nextDouble() > 0.5 ? 1.0 : -1.0);
+                        value = value + variation;
                     } else {
-                        value = null;
+                        value = 0.0;
                     }
+
                     notifyUpdate(value);
                 }
             }, TASK_DELAY_TIME, UPDATE_PERIOD);
@@ -98,43 +119,35 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
         }
     }
 
-    public void checkPresenceInCameraStream(){
-        // managing value
-        int num = this.random.nextInt(10);
-        this.value = num == 9; // if num == 9, return true, otherwise is always false
-
-        // managing timestamp
-        this.timestamp = System.currentTimeMillis();
-    }
-
     @Override
-    public Boolean loadUpdatedValue() {
+    public Double loadUpdatedValue() {
         return this.value;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("PresenceRawSensor{");
-        sb.append("uuidId='").append(getUuid()).append('\'');
-        sb.append(", timestamp=").append(timestamp);
+        final StringBuffer sb = new StringBuffer("EnergyConsumptionSensorDescriptor{");
+        sb.append("uuid='").append(getUuid()).append('\'');
+        sb.append("timestamp=").append(timestamp);
         sb.append(", version=").append(getVersion());
         sb.append(", value=").append(value);
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
     public static void main(String[] args) {
 
-        PresenceRawSensor rawSensor = new PresenceRawSensor("robot-0001", 0.1);
-        rawSensor.setActivate(true);
+        EnergyConsumptionRawSensor rawResource = new EnergyConsumptionRawSensor("charger-0001", 0.1);
+        rawResource.setActive(true);
         logger.info("New Resource Created with Id: {} ! {} New Value: {}",
-                rawSensor.getUuid(),
-                "PresenceRawSensor",
-                rawSensor.loadUpdatedValue());
+                rawResource.getUuid(),
+                "EnergyConsumptionRawSensor",
+                rawResource.loadUpdatedValue());
 
-        rawSensor.addDataListener(new GeneralDataListener<Boolean>() {
+        rawResource.addDataListener(new GeneralDataListener<Double>() {
             @Override
-            public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
+            public void onDataChanged(GeneralDescriptor<Double> resource, Double updatedValue) {
 
                 if(resource != null && updatedValue != null)
                     logger.info("Device: {} -> New Value Received: {}", resource.getUuid(), updatedValue);
@@ -142,5 +155,6 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
                     logger.error("onDataChanged Callback -> Null Resource or Updated Value !");
             }
         });
+
     }
 }

@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.presence.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.test.model.IPassiveInfraRedSensorDescriptor;
 
 import java.util.Random;
 

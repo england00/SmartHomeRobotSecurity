@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.resource.charger;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.charger.ChargingStationDescriptor;
+import it.unimore.fum.iot.model.descriptor.ChargingStationDescriptor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -9,6 +9,8 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -19,6 +21,7 @@ import java.util.Optional;
  */
 public class ChargingStationResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(ChargingStationResource.class);
     private static final String OBJECT_TITLE = "ChargingStation";
     private Gson gson;
     private final ChargingStationDescriptor chargingStationDescriptor;
@@ -48,9 +51,11 @@ public class ChargingStationResource extends CoapResource {
 
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
+            senMLRecord1.setN("chargerId");
             senMLRecord1.setN(this.chargingStationDescriptor.getChargerId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
+            senMLRecord2.setN("room");
             senMLRecord2.setN(this.chargingStationDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
@@ -58,6 +63,7 @@ public class ChargingStationResource extends CoapResource {
             senMLRecord3.setV(this.chargingStationDescriptor.getSoftwareVersion());
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
+            senMLRecord4.setN("manufacturer");
             senMLRecord4.setN(this.chargingStationDescriptor.getManufacturer());
 
             SenMLRecord senMLRecord5 = new SenMLRecord();
@@ -87,6 +93,7 @@ public class ChargingStationResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -102,6 +109,7 @@ public class ChargingStationResource extends CoapResource {
                 exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.chargingStationDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         }  catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

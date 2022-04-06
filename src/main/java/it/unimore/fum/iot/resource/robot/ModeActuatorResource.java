@@ -1,9 +1,9 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.GeneralDataListener;
-import it.unimore.fum.iot.model.robot.GeneralDescriptor;
-import it.unimore.fum.iot.model.robot.raw.ModeRawActuator;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
+import it.unimore.fum.iot.model.raw.ModeRawActuator;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;

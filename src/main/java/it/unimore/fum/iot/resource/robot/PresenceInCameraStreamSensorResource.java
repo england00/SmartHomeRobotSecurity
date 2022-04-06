@@ -1,10 +1,10 @@
 package it.unimore.fum.iot.resource.robot;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.robot.GeneralDataListener;
-import it.unimore.fum.iot.model.robot.GeneralDescriptor;
-import it.unimore.fum.iot.model.robot.raw.BatteryLevelRawSensor;
-import it.unimore.fum.iot.model.robot.raw.PresenceRawSensor;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
+import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;

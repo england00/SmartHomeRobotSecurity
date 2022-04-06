@@ -1,7 +1,10 @@
 package it.unimore.fum.iot.resource.presence;
 
 import com.google.gson.Gson;
-import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
+import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.utils.CoreInterfaces;
 import it.unimore.fum.iot.utils.SenMLPack;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -9,7 +12,8 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 /**
@@ -19,14 +23,31 @@ import java.util.Optional;
  */
 public class PassiveInfraRedSensorResource extends CoapResource {
 
+    private final static Logger logger = LoggerFactory.getLogger(PassiveInfraRedSensorResource.class);
     private static final String OBJECT_TITLE = "PassiveInfraRedSensor";
     private Gson gson;
-    private final IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor;
+    private final PresenceRawSensor passiveInfraRedSensorDescriptor;
 
-    public PassiveInfraRedSensorResource(String name, IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor) {
+    public PassiveInfraRedSensorResource(String name, PresenceRawSensor passiveInfraRedSensorDescriptor) {
         super(name);
         this.passiveInfraRedSensorDescriptor = passiveInfraRedSensorDescriptor;
-        init();
+
+        if (passiveInfraRedSensorDescriptor != null && passiveInfraRedSensorDescriptor.getUuid() != null) {
+            init();
+        } else {
+            logger.error("Error -> NULL Raw Reference !");
+        }
+
+        assert this.passiveInfraRedSensorDescriptor != null;
+        this.passiveInfraRedSensorDescriptor.addDataListener(new GeneralDataListener<Boolean>() {
+            @Override
+            public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
+
+                // produce the data only if detect a presence
+                if (updatedValue)
+                    changed();
+            }
+        });
     }
 
     private void init() {
@@ -37,6 +58,7 @@ public class PassiveInfraRedSensorResource extends CoapResource {
         setObserveType(CoAP.Type.CON);
 
         getAttributes().setTitle(OBJECT_TITLE);
+        getAttributes().setObservable();
         getAttributes().addAttribute("rt", "it.unimore.presence_monitor.sensor.pir");
         getAttributes().addAttribute("if", CoreInterfaces.CORE_S.getValue());
         getAttributes().addAttribute("ct", Integer.toString(MediaTypeRegistry.APPLICATION_SENML_JSON));
@@ -50,11 +72,11 @@ public class PassiveInfraRedSensorResource extends CoapResource {
             SenMLPack senMLPack = new SenMLPack();
 
             SenMLRecord senMLRecord = new SenMLRecord();
-            senMLRecord.setBn(this.passiveInfraRedSensorDescriptor.getPresenceId());
+            senMLRecord.setBn(this.passiveInfraRedSensorDescriptor.getUuid());
             senMLRecord.setN("pir");
             senMLRecord.setT(this.passiveInfraRedSensorDescriptor.getTimestamp());
             senMLRecord.setBver(this.passiveInfraRedSensorDescriptor.getVersion());
-            senMLRecord.setVb(this.passiveInfraRedSensorDescriptor.isValue());
+            senMLRecord.setVb(this.passiveInfraRedSensorDescriptor.getValue());
 
             senMLPack.add(senMLRecord);
 
@@ -68,8 +90,10 @@ public class PassiveInfraRedSensorResource extends CoapResource {
     // response to GET function
     @Override
     public void handleGET(CoapExchange exchange) {
+
         try {
-            this.passiveInfraRedSensorDescriptor.checkPassiveInfraRedSensorDescriptor();
+            // the Max-Age value should match the update interval
+            exchange.setMaxAge(BatteryLevelRawSensor.UPDATE_PERIOD);
 
             // if the request specify the MediaType as JSON or JSON+SenML
             if (exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
@@ -85,6 +109,7 @@ public class PassiveInfraRedSensorResource extends CoapResource {
                 exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(this.passiveInfraRedSensorDescriptor.toString()), MediaTypeRegistry.TEXT_PLAIN);
 
         }  catch (Exception e){
+            logger.error("Error Handling GET -> {}", e.getLocalizedMessage());
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }

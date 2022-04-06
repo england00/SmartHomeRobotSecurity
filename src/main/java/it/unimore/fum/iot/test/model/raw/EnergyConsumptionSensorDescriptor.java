@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.charger.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.charger.IEnergyConsumptionSensorDescriptor;
+import it.unimore.fum.iot.test.model.IEnergyConsumptionSensorDescriptor;
 
 import java.util.Random;
 

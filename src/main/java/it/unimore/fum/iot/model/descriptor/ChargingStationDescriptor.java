@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model.charger;
+package it.unimore.fum.iot.model.descriptor;
 
 import java.util.Arrays;
 

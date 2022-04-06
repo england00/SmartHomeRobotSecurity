@@ -1,27 +1,27 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.model.raw;
 
-import it.unimore.fum.iot.model.robot.GeneralDataListener;
-import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 06/04/2022 - 02:55
+ * @created 06/04/2022 - 10:59
  */
-public class ModeRawActuator extends GeneralDescriptor<String> {
+public class SwitchRawActuator extends GeneralDescriptor<Boolean> {
 
     // actuator's parameters
     private long timestamp;
-    private String value;
+    private boolean value;
 
     // utility variables
-    private static final Logger logger = LoggerFactory.getLogger(ModeRawActuator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SwitchRawActuator.class);
 
-    public ModeRawActuator(String robotId, Number version) {
+    public SwitchRawActuator(String robotId, Number version) {
         super(robotId, version);
-        this.value = "STOP";
+        this.value = false;
     }
 
     public long getTimestamp() {
@@ -32,54 +32,48 @@ public class ModeRawActuator extends GeneralDescriptor<String> {
         this.timestamp = timestamp;
     }
 
-    public String getValue() {
+    public boolean isValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(boolean value) {
         this.value = value;
     }
 
-    public void modeStart(){
-        this.value = "START";
-        notifyUpdate(getValue());
+    public void switchStatusOn(){
+        this.value = true;
+        notifyUpdate(isValue());
         this.timestamp = System.currentTimeMillis();
     }
 
-    public void modePause(){
-        this.value = "PAUSE";
-        notifyUpdate(getValue());
-        this.timestamp = System.currentTimeMillis();
-    }
-
-    public void modeStop(){
-        this.value = "STOP";
-        notifyUpdate(getValue());
+    public void switchStatusOff(){
+        this.value = false;
+        notifyUpdate(isValue());
         this.timestamp = System.currentTimeMillis();
     }
 
     @Override
-    public String loadUpdatedValue() {
+    public Boolean loadUpdatedValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ModeRawActuator{");
+        final StringBuffer sb = new StringBuffer("SwitchRawActuator{");
         sb.append("uuid='").append(getUuid()).append('\'');
         sb.append(", timestamp=").append(timestamp);
         sb.append(", version=").append(getVersion());
-        sb.append(", value='").append(value).append('\'');
+        sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();
     }
 
     public static void main(String[] args) {
 
-        ModeRawActuator rawResource = new ModeRawActuator("robot-0001", 0.1);
+        SwitchRawActuator rawResource = new SwitchRawActuator("robot-0001", 0.1);
         logger.info("New Resource Created with Id: {} ! {} New Value: {}",
                 rawResource.getUuid(),
-                "ModeActuator",
+                "SwitchActuator",
                 rawResource.loadUpdatedValue());
 
         new Thread(new Runnable() {
@@ -87,12 +81,10 @@ public class ModeRawActuator extends GeneralDescriptor<String> {
             public void run() {
                 try{
                     for(int i=0; i<100; i++){
-                        if (rawResource.getValue().equals("STOP")) {
-                            rawResource.modeStart();
-                        } else if (rawResource.getValue().equals("START")) {
-                            rawResource.modePause();
+                        if (rawResource.loadUpdatedValue()) {
+                            rawResource.switchStatusOff();
                         } else {
-                            rawResource.modeStop();
+                            rawResource.switchStatusOn();
                         }
                         Thread.sleep(1000);
                     }
@@ -102,9 +94,9 @@ public class ModeRawActuator extends GeneralDescriptor<String> {
             }
         }).start();
 
-        rawResource.addDataListener(new GeneralDataListener<String>() {
+        rawResource.addDataListener(new GeneralDataListener<Boolean>() {
             @Override
-            public void onDataChanged(GeneralDescriptor<String> resource, String updatedValue) {
+            public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
 
                 if(resource != null && updatedValue != null)
                     logger.info("Device: {} -> New Value Received: {}", resource.getUuid(), updatedValue);

@@ -1,33 +1,33 @@
-package it.unimore.fum.iot.model.robot;
+package it.unimore.fum.iot.model.descriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 15/03/2022 - 12:14
+ * @created 15/03/2022 - 12:46
  */
-public class RobotDescriptor {
+public class PresenceMonitoringObjectDescriptor {
 
     // object's parameters
-    private String robotId;
+    private String presenceId;
     private String room;
     private Number softwareVersion;
     private String manufacturer;
 
-    public RobotDescriptor() {}
+    public PresenceMonitoringObjectDescriptor() {}
 
-    public RobotDescriptor(String robotId, String room, Number softwareVersion, String manufacturer) {
-        this.robotId = robotId;
+    public PresenceMonitoringObjectDescriptor(String presenceId, String room, Number softwareVersion, String manufacturer) {
+        this.presenceId = presenceId;
         this.room = room;
         this.softwareVersion = softwareVersion;
         this.manufacturer = manufacturer;
     }
 
-    public String getRobotId() {
-        return robotId;
+    public String getPresenceId() {
+        return presenceId;
     }
 
-    public void setRobotId(String robotId) {
-        this.robotId = robotId;
+    public void setPresenceId(String presenceId) {
+        this.presenceId = presenceId;
     }
 
     public String getRoom() {
@@ -56,8 +56,8 @@ public class RobotDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("RobotDescriptor{");
-        sb.append("robotId='").append(robotId).append('\'');
+        final StringBuffer sb = new StringBuffer("PresenceMonitoringDescriptor{");
+        sb.append("presenceId='").append(presenceId).append('\'');
         sb.append(", room='").append(room).append('\'');
         sb.append(", softwareVersion=").append(softwareVersion);
         sb.append(", manufacturer='").append(manufacturer).append('\'');

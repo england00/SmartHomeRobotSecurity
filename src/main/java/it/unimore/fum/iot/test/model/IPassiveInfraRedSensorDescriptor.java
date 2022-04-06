@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.model.presence;
+package it.unimore.fum.iot.test.model;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

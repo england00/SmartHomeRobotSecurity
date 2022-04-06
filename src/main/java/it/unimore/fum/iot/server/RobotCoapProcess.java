@@ -1,9 +1,9 @@
 package it.unimore.fum.iot.server;
 
 import it.unimore.fum.iot.exception.*;
-import it.unimore.fum.iot.model.home.RoomDescriptor;
-import it.unimore.fum.iot.model.robot.RobotDescriptor;
-import it.unimore.fum.iot.model.robot.raw.*;
+import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
+import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
+import it.unimore.fum.iot.model.raw.*;
 import it.unimore.fum.iot.persistence.IRoomsManager;
 import it.unimore.fum.iot.persistence.RoomsManager;
 import it.unimore.fum.iot.resource.robot.*;
@@ -61,9 +61,9 @@ public class RobotCoapProcess extends CoapServer {
     private void ResourcesCreation(RoomDescriptor roomDescriptor, RobotDescriptor robotDescriptor) {
 
         // init emulated physical sensors and actuators
-        BatteryLevelRawSensor robotBatteryLevelSensor = new BatteryLevelRawSensor(robotDescriptor.getRobotId(), 0.1);
+        BatteryLevelRawSensor robotBatteryLevelSensor = new BatteryLevelRawSensor(robotDescriptor.getRobotId(), 0.1, false);
         IndoorPositionRawSensor robotIndoorPositionSensor = new IndoorPositionRawSensor(robotDescriptor.getRobotId(), 0.1, roomDescriptor.getDimensions(), roomDescriptor.getOrigin());
-        PresenceRawSensor robotPresenceInCameraStreamSensor = new PresenceRawSensor(robotDescriptor.getRobotId(), 0.1);
+        PresenceRawSensor robotPresenceInCameraStreamSensor = new PresenceRawSensor(robotDescriptor.getRobotId(), 0.1, true);
         SwitchRawActuator robotCameraSwitchActuator = new SwitchRawActuator(robotDescriptor.getRobotId(), 0.1);
         ModeRawActuator robotModeActuator = new ModeRawActuator(robotDescriptor.getRobotId(), 0.1);
         ReturnHomeRawActuator robotReturnHomeActuator = new ReturnHomeRawActuator(robotDescriptor.getRobotId(), 0.1);

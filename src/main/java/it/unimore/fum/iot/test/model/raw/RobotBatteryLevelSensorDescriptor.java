@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.charger.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.charger.IRobotBatteryLevelSensorDescriptor;
+import it.unimore.fum.iot.test.model.IRobotBatteryLevelSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

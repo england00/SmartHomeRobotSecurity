@@ -2,10 +2,9 @@ package it.unimore.fum.iot.server;
 
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.home.RoomDescriptor;
-import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
-import it.unimore.fum.iot.model.presence.PresenceMonitoringObjectDescriptor;
-import it.unimore.fum.iot.model.presence.raw.PassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
+import it.unimore.fum.iot.model.descriptor.PresenceMonitoringObjectDescriptor;
+import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.persistence.IRoomsManager;
 import it.unimore.fum.iot.persistence.RoomsManager;
 import it.unimore.fum.iot.resource.presence.PassiveInfraRedSensorResource;
@@ -63,13 +62,13 @@ public class PresenceMonitoringObjectCoapProcess extends CoapServer {
     private void ResourcesCreation(RoomDescriptor roomDescriptor, PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor) {
 
         // init emulated physical sensor
-        IPassiveInfraRedSensorDescriptor passiveInfraRedSensorDescriptor = new PassiveInfraRedSensorDescriptor(presenceMonitoringObjectDescriptor.getPresenceId(), 0.1);
+        PresenceRawSensor presencePIRSensorDescriptor = new PresenceRawSensor(presenceMonitoringObjectDescriptor.getPresenceId(), 0.1, true);
 
         // descriptor
         this.add(new PresenceMonitoringObjectResource("descriptor", presenceMonitoringObjectDescriptor));
 
         // sensor
-        this.add(new PassiveInfraRedSensorResource("sensor/pir", passiveInfraRedSensorDescriptor));
+        this.add(new PassiveInfraRedSensorResource("pir", presencePIRSensorDescriptor));
     }
 
     public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {

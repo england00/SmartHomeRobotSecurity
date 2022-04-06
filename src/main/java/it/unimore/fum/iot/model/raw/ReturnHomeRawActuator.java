@@ -1,25 +1,28 @@
-package it.unimore.fum.iot.model.robot.raw;
+package it.unimore.fum.iot.model.raw;
 
-import it.unimore.fum.iot.model.robot.GeneralDataListener;
-import it.unimore.fum.iot.model.robot.GeneralDescriptor;
+import it.unimore.fum.iot.model.general.GeneralDataListener;
+import it.unimore.fum.iot.model.general.GeneralDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
- * @created 06/04/2022 - 10:59
+ * @created 06/04/2022 - 12:41
  */
-public class SwitchRawActuator extends GeneralDescriptor<Boolean> {
+public class ReturnHomeRawActuator extends GeneralDescriptor<Boolean> {
 
     // actuator's parameters
     private long timestamp;
     private boolean value;
+    private double[] chargerPosition = null;
+    private String unit = "meter";
 
     // utility variables
-    private static final Logger logger = LoggerFactory.getLogger(SwitchRawActuator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReturnHomeRawActuator.class);
 
-    public SwitchRawActuator(String robotId, Number version) {
+    public ReturnHomeRawActuator(String robotId, Number version) {
         super(robotId, version);
         this.value = false;
     }
@@ -40,13 +43,29 @@ public class SwitchRawActuator extends GeneralDescriptor<Boolean> {
         this.value = value;
     }
 
-    public void switchStatusOn(){
+    public double[] getChargerPosition() {
+        return chargerPosition;
+    }
+
+    public void setChargerPosition(double[] chargerPosition) {
+        this.chargerPosition = chargerPosition;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public void switchReturnOn(){
         this.value = true;
         notifyUpdate(isValue());
         this.timestamp = System.currentTimeMillis();
     }
 
-    public void switchStatusOff(){
+    public void switchReturnOff(){
         this.value = false;
         notifyUpdate(isValue());
         this.timestamp = System.currentTimeMillis();
@@ -59,21 +78,23 @@ public class SwitchRawActuator extends GeneralDescriptor<Boolean> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("SwitchRawActuator{");
+        final StringBuffer sb = new StringBuffer("ReturnHomeRawActuator{");
         sb.append("uuid='").append(getUuid()).append('\'');
         sb.append(", timestamp=").append(timestamp);
         sb.append(", version=").append(getVersion());
         sb.append(", value=").append(value);
+        sb.append(", chargerPosition=").append(Arrays.toString(chargerPosition));
+        sb.append(", unit='").append(unit).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
     public static void main(String[] args) {
 
-        SwitchRawActuator rawResource = new SwitchRawActuator("robot-0001", 0.1);
+        ReturnHomeRawActuator rawResource = new ReturnHomeRawActuator("robot-0001", 0.1);
         logger.info("New Resource Created with Id: {} ! {} New Value: {}",
                 rawResource.getUuid(),
-                "SwitchActuator",
+                "ReturnHomeActuator",
                 rawResource.loadUpdatedValue());
 
         new Thread(new Runnable() {
@@ -82,9 +103,9 @@ public class SwitchRawActuator extends GeneralDescriptor<Boolean> {
                 try{
                     for(int i=0; i<100; i++){
                         if (rawResource.loadUpdatedValue()) {
-                            rawResource.switchStatusOff();
+                            rawResource.switchReturnOff();
                         } else {
-                            rawResource.switchStatusOn();
+                            rawResource.switchReturnOn();
                         }
                         Thread.sleep(1000);
                     }

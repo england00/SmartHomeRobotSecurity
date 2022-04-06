@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.robot.RobotDescriptor;
+import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

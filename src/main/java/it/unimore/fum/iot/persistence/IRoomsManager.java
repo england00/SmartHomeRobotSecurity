@@ -2,7 +2,7 @@ package it.unimore.fum.iot.persistence;
 
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.home.RoomDescriptor;
+import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 
 import java.util.HashMap;
 import java.util.List;

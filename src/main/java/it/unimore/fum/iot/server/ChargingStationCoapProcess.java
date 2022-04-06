@@ -2,14 +2,11 @@ package it.unimore.fum.iot.server;
 
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.charger.ChargingStationDescriptor;
-import it.unimore.fum.iot.model.charger.IEnergyConsumptionSensorDescriptor;
-import it.unimore.fum.iot.model.charger.IRobotBatteryLevelSensorDescriptor;
-import it.unimore.fum.iot.model.charger.IRobotPresenceSensorDescriptor;
-import it.unimore.fum.iot.model.charger.raw.EnergyConsumptionSensorDescriptor;
-import it.unimore.fum.iot.model.charger.raw.RobotBatteryLevelSensorDescriptor;
-import it.unimore.fum.iot.model.charger.raw.RobotPresenceSensorDescriptor;
-import it.unimore.fum.iot.model.home.RoomDescriptor;
+import it.unimore.fum.iot.model.descriptor.ChargingStationDescriptor;
+import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
+import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.raw.EnergyConsumptionRawSensor;
+import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.persistence.IRoomsManager;
 import it.unimore.fum.iot.persistence.RoomsManager;
 import it.unimore.fum.iot.resource.charger.ChargingStationResource;
@@ -19,7 +16,6 @@ import it.unimore.fum.iot.resource.charger.RobotPresenceSensorResource;
 import org.eclipse.californium.core.CoapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.UUID;
 
 /**
@@ -70,17 +66,18 @@ public class ChargingStationCoapProcess extends CoapServer {
     private void ResourcesCreation(RoomDescriptor roomDescriptor, ChargingStationDescriptor chargingStationDescriptor) {
 
         // init emulated physical sensor
-        IEnergyConsumptionSensorDescriptor energyConsumptionSensorDescriptor = new EnergyConsumptionSensorDescriptor(chargingStationDescriptor.getChargerId(), 0.1);
-        IRobotBatteryLevelSensorDescriptor robotBatteryLevelSensorDescriptor = new RobotBatteryLevelSensorDescriptor(chargingStationDescriptor.getChargerId(), 0.1);
-        IRobotPresenceSensorDescriptor robotPresenceSensorDescriptor = new RobotPresenceSensorDescriptor(chargingStationDescriptor.getChargerId(), 0.1);
+        BatteryLevelRawSensor chargerRobotBatteryLevelSensor = new BatteryLevelRawSensor(chargingStationDescriptor.getChargerId(), 0.1, true);
+        EnergyConsumptionRawSensor chargerEnergyConsumptionSensor = new EnergyConsumptionRawSensor(chargingStationDescriptor.getChargerId(), 0.1);
+        PresenceRawSensor chargerRobotPresenceSensor = new PresenceRawSensor(chargingStationDescriptor.getChargerId(), 0.1, false);
 
         // descriptor
         this.add(new ChargingStationResource("descriptor", chargingStationDescriptor));
 
         // sensor
-        this.add(new EnergyConsumptionSensorResource("sensor/energy_consumption", energyConsumptionSensorDescriptor));
-        this.add(new RobotBatteryLevelSensorResource("sensor/recharging_battery", robotBatteryLevelSensorDescriptor));
-        this.add(new RobotPresenceSensorResource("sensor/robot_presence", robotPresenceSensorDescriptor));
+        this.add(new RobotBatteryLevelSensorResource("recharging_battery", chargerRobotBatteryLevelSensor));
+        this.add(new EnergyConsumptionSensorResource("energy_consumption", chargerEnergyConsumptionSensor));
+        chargerRobotPresenceSensor.setValue(true);
+        this.add(new RobotPresenceSensorResource("robot_presence", chargerRobotPresenceSensor));
     }
 
     public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {

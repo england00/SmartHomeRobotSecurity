@@ -2,9 +2,9 @@ package it.unimore.fum.iot.test.persistence;
 
 import it.unimore.fum.iot.exception.RoomsManagerConflict;
 import it.unimore.fum.iot.exception.RoomsManagerException;
-import it.unimore.fum.iot.model.charger.ChargingStationDescriptor;
-import it.unimore.fum.iot.model.presence.PresenceMonitoringObjectDescriptor;
-import it.unimore.fum.iot.model.robot.RobotDescriptor;
+import it.unimore.fum.iot.model.descriptor.ChargingStationDescriptor;
+import it.unimore.fum.iot.model.descriptor.PresenceMonitoringObjectDescriptor;
+import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,6 @@
-package it.unimore.fum.iot.model.charger.raw;
+package it.unimore.fum.iot.test.model.raw;
 
-import it.unimore.fum.iot.model.charger.IRobotPresenceSensorDescriptor;
+import it.unimore.fum.iot.test.model.IRobotPresenceSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it

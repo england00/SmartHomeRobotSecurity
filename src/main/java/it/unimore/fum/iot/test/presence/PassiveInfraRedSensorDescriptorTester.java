@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.test.presence;
 
-import it.unimore.fum.iot.model.presence.IPassiveInfraRedSensorDescriptor;
-import it.unimore.fum.iot.model.presence.raw.PassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.test.model.IPassiveInfraRedSensorDescriptor;
+import it.unimore.fum.iot.test.model.raw.PassiveInfraRedSensorDescriptor;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
