@@ -34,8 +34,6 @@ public class EnergyConsumptionRawSensor extends GeneralDescriptor<Double> {
     private static final double MAX_ENERGY_VALUE = 1.0;
     private static final double MIN_ENERGY_VARIATION = 0.1;
     private static final double MAX_ENERGY_VARIATION = 0.5;
-    private static final double CAPACITY = 0.7;
-    private static final double RECHARGING_SPEED = 0.003;
 
     public EnergyConsumptionRawSensor(String robotId, Number version) {
         super(robotId, version);
