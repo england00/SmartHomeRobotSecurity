@@ -42,10 +42,7 @@ public class PassiveInfraRedSensorResource extends CoapResource {
         this.passiveInfraRedSensorDescriptor.addDataListener(new GeneralDataListener<Boolean>() {
             @Override
             public void onDataChanged(GeneralDescriptor<Boolean> resource, Boolean updatedValue) {
-
-                // produce the data only if detect a presence
-                if (updatedValue)
-                    changed();
+                changed();
             }
         });
     }
