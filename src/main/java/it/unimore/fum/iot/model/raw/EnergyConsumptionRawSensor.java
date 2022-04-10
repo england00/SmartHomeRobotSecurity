@@ -106,11 +106,10 @@ public class EnergyConsumptionRawSensor extends GeneralDescriptor<Double> {
                         value = 0.0;
                     }
 
+                    timestamp = System.currentTimeMillis();
                     notifyUpdate(value);
                 }
             }, TASK_DELAY_TIME, UPDATE_PERIOD);
-
-            this.timestamp = System.currentTimeMillis();
 
         } catch (Exception e){
             logger.error("Error executing periodic Battery Level! Msg: {}", e.getLocalizedMessage());

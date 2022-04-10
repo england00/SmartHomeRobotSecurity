@@ -40,7 +40,7 @@ public class DataManagerPutClientProcess {
 
         Gson gson = new Gson();
 
-        //Set PUT request's payload
+
         if (ENDPOINT == ROBOT_MODE_ACTUATOR) {
             String requestPayload = gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START));
             //String requestPayload = gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_PAUSE));

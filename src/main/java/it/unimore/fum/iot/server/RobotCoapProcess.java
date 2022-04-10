@@ -1,5 +1,6 @@
 package it.unimore.fum.iot.server;
 
+import ch.qos.logback.classic.Level;
 import it.unimore.fum.iot.exception.*;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
@@ -25,6 +26,8 @@ public class RobotCoapProcess extends CoapServer {
 
         super();
         String robotId = String.format("robot-%s", UUID.randomUUID().toString());
+
+        logger.info(String.valueOf(logger.isDebugEnabled()));
 
         // room
         RoomDescriptor roomDescriptor = Room();
@@ -67,6 +70,9 @@ public class RobotCoapProcess extends CoapServer {
         SwitchRawActuator robotCameraSwitchActuator = new SwitchRawActuator(robotDescriptor.getRobotId(), 0.1);
         ModeRawActuator robotModeActuator = new ModeRawActuator(robotDescriptor.getRobotId(), 0.1);
         ReturnHomeRawActuator robotReturnHomeActuator = new ReturnHomeRawActuator(robotDescriptor.getRobotId(), 0.1);
+
+        robotIndoorPositionSensor.setReturnFlag(robotReturnHomeActuator.isValue());
+        robotIndoorPositionSensor.setChargerPosition(robotReturnHomeActuator.getChargerPosition());
 
         // descriptor
         this.add(new RobotResource("descriptor", robotDescriptor));

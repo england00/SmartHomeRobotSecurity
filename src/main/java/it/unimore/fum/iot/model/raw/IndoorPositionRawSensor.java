@@ -184,12 +184,11 @@ public class IndoorPositionRawSensor extends GeneralDescriptor<Double[]> {
                         }
                     }
 
+                    timestamp = System.currentTimeMillis();
                     notifyUpdate(position);
 
                 }
             }, TASK_DELAY_TIME, UPDATE_PERIOD);
-
-            this.timestamp = System.currentTimeMillis();
 
         } catch (Exception e){
             logger.error("Error executing periodic Indoor Position! Msg: {}", e.getLocalizedMessage());

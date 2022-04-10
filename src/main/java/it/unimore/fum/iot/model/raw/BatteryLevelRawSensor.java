@@ -119,12 +119,10 @@ public class BatteryLevelRawSensor extends GeneralDescriptor<Double> {
                         }
                     }
 
-
+                    timestamp = System.currentTimeMillis();
                     notifyUpdate(batteryLevel);
                 }
             }, TASK_DELAY_TIME, UPDATE_PERIOD);
-
-            this.timestamp = System.currentTimeMillis();
 
         } catch (Exception e){
             logger.error("Error executing periodic Battery Level! Msg: {}", e.getLocalizedMessage());

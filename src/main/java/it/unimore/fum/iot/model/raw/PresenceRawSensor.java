@@ -88,24 +88,14 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
                     } else {
                         value = false;
                     }
+                    timestamp = System.currentTimeMillis();
                     notifyUpdate(value);
                 }
             }, TASK_DELAY_TIME, UPDATE_PERIOD);
 
-            this.timestamp = System.currentTimeMillis();
-
         } catch (Exception e){
             logger.error("Error executing periodic Battery Level! Msg: {}", e.getLocalizedMessage());
         }
-    }
-
-    public void checkPresenceInCameraStream(){
-        // managing value
-        int num = this.random.nextInt(10);
-        this.value = num == 9; // if num == 9, return true, otherwise is always false
-
-        // managing timestamp
-        this.timestamp = System.currentTimeMillis();
     }
 
     @Override

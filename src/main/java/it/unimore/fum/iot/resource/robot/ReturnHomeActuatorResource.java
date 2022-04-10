@@ -148,6 +148,7 @@ public class ReturnHomeActuatorResource extends CoapResource {
                 if (makeReturnHomeRequest.getType().equals(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME)) {
                     this.returnHomeRawActuator.switchReturnOn();
                     this.returnHomeRawActuator.setChargerPosition(makeReturnHomeRequest.getPosition());
+
                     logger.info("Resource Status Updated: {}", this.returnHomeRawActuator.isValue());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
