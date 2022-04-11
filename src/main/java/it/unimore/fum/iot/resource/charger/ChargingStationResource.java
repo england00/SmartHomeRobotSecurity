@@ -52,11 +52,11 @@ public class ChargingStationResource extends CoapResource {
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
             senMLRecord1.setN("chargerId");
-            senMLRecord1.setN(this.chargingStationDescriptor.getChargerId());
+            senMLRecord1.setVs(this.chargingStationDescriptor.getChargerId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
             senMLRecord2.setN("room");
-            senMLRecord2.setN(this.chargingStationDescriptor.getRoom());
+            senMLRecord2.setVs(this.chargingStationDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
             senMLRecord3.setN("softwareVersion");
@@ -64,7 +64,7 @@ public class ChargingStationResource extends CoapResource {
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
             senMLRecord4.setN("manufacturer");
-            senMLRecord4.setN(this.chargingStationDescriptor.getManufacturer());
+            senMLRecord4.setVs(this.chargingStationDescriptor.getManufacturer());
 
             SenMLRecord senMLRecord5 = new SenMLRecord();
             senMLRecord5.setN("X");

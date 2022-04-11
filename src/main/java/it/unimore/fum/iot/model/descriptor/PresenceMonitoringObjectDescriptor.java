@@ -56,7 +56,7 @@ public class PresenceMonitoringObjectDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("PresenceMonitoringDescriptor{");
+        final StringBuffer sb = new StringBuffer("PresenceMonitoringObjectDescriptor{");
         sb.append("presenceId='").append(presenceId).append('\'');
         sb.append(", room='").append(room).append('\'');
         sb.append(", softwareVersion=").append(softwareVersion);

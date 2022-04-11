@@ -86,7 +86,7 @@ public class PresenceRawSensor extends GeneralDescriptor<Boolean> {
                         int num = random.nextInt(10);
                         value = num == 9; // if num == 9, return true, otherwise is always false
                     } else {
-                        value = false;
+                        value = true;
                     }
                     timestamp = System.currentTimeMillis();
                     notifyUpdate(value);

@@ -3,6 +3,7 @@ package it.unimore.fum.iot.resource.robot;
 import com.google.gson.Gson;
 import it.unimore.fum.iot.model.general.GeneralDataListener;
 import it.unimore.fum.iot.model.general.GeneralDescriptor;
+import it.unimore.fum.iot.model.raw.IndoorPositionRawSensor;
 import it.unimore.fum.iot.model.raw.ReturnHomeRawActuator;
 import it.unimore.fum.iot.request.MakeReturnHomeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
@@ -27,11 +28,13 @@ public class ReturnHomeActuatorResource extends CoapResource {
     private static final String OBJECT_TITLE = "ReturnHomeActuator";
     private Gson gson;
     private final ReturnHomeRawActuator returnHomeRawActuator;
+    private final IndoorPositionRawSensor indoorPositionRawSensor;
     private static final String UNIT = "m";
 
-    public ReturnHomeActuatorResource(String name, ReturnHomeRawActuator returnHomeRawActuator) {
+    public ReturnHomeActuatorResource(String name, ReturnHomeRawActuator returnHomeRawActuator, IndoorPositionRawSensor indoorPositionRawSensor) {
         super(name);
         this.returnHomeRawActuator = returnHomeRawActuator;
+        this.indoorPositionRawSensor = indoorPositionRawSensor;
 
         if (returnHomeRawActuator != null && returnHomeRawActuator.getUuid() != null) {
             init();
@@ -148,8 +151,9 @@ public class ReturnHomeActuatorResource extends CoapResource {
                 if (makeReturnHomeRequest.getType().equals(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME)) {
                     this.returnHomeRawActuator.switchReturnOn();
                     this.returnHomeRawActuator.setChargerPosition(makeReturnHomeRequest.getPosition());
-
                     logger.info("Resource Status Updated: {}", this.returnHomeRawActuator.isValue());
+                    this.indoorPositionRawSensor.setReturnFlag(this.returnHomeRawActuator.isValue());
+                    this.indoorPositionRawSensor.setChargerPosition(this.returnHomeRawActuator.getChargerPosition());
                     exchange.respond(ResponseCode.CHANGED);
                     changed();
                 } else if (makeReturnHomeRequest.getType().equals(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME)) {

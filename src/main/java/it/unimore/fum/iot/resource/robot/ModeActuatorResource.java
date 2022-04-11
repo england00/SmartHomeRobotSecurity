@@ -3,6 +3,8 @@ package it.unimore.fum.iot.resource.robot;
 import com.google.gson.Gson;
 import it.unimore.fum.iot.model.general.GeneralDataListener;
 import it.unimore.fum.iot.model.general.GeneralDescriptor;
+import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.raw.IndoorPositionRawSensor;
 import it.unimore.fum.iot.model.raw.ModeRawActuator;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.utils.CoreInterfaces;
@@ -27,10 +29,14 @@ public class ModeActuatorResource extends CoapResource {
     private static final String OBJECT_TITLE = "ModeActuator";
     private Gson gson;
     private final ModeRawActuator modeRawActuator;
+    private final IndoorPositionRawSensor indoorPositionRawSensor;
+    private  final BatteryLevelRawSensor batteryLevelRawSensor;
 
-    public ModeActuatorResource (String name, ModeRawActuator modeRawActuator) {
+    public ModeActuatorResource (String name, ModeRawActuator modeRawActuator, IndoorPositionRawSensor indoorPositionRawSensor, BatteryLevelRawSensor batteryLevelRawSensor) {
         super(name);
         this.modeRawActuator = modeRawActuator;
+        this.indoorPositionRawSensor = indoorPositionRawSensor;
+        this.batteryLevelRawSensor = batteryLevelRawSensor;
 
         if (modeRawActuator != null && modeRawActuator.getUuid() != null) {
             init();
@@ -115,6 +121,9 @@ public class ModeActuatorResource extends CoapResource {
             } else if (this.modeRawActuator.getValue().equals("PAUSE")) {
                 this.modeRawActuator.modeStart();
                 logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
+                this.indoorPositionRawSensor.setReturnFlag(false);
+                this.indoorPositionRawSensor.setChargerPosition(null);
+                this.batteryLevelRawSensor.setBatteryLevel(100.0);
                 exchange.respond(CoAP.ResponseCode.CHANGED);
                 changed();
             } else {
@@ -143,6 +152,9 @@ public class ModeActuatorResource extends CoapResource {
                     case MakeModeRequest.MODE_START -> {
                         this.modeRawActuator.modeStart();
                         logger.info("Resource Status Updated: {}", this.modeRawActuator.getValue());
+                        this.indoorPositionRawSensor.setReturnFlag(false);
+                        this.indoorPositionRawSensor.setChargerPosition(null);
+                        this.batteryLevelRawSensor.setBatteryLevel(100.0);
                         exchange.respond(CoAP.ResponseCode.CHANGED);
                         changed();
                     }

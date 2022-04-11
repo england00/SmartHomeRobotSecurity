@@ -70,9 +70,6 @@ public class RobotCoapProcess extends CoapServer {
         ModeRawActuator robotModeActuator = new ModeRawActuator(robotDescriptor.getRobotId(), 0.1);
         ReturnHomeRawActuator robotReturnHomeActuator = new ReturnHomeRawActuator(robotDescriptor.getRobotId(), 0.1);
 
-        robotIndoorPositionSensor.setReturnFlag(robotReturnHomeActuator.isValue());
-        robotIndoorPositionSensor.setChargerPosition(robotReturnHomeActuator.getChargerPosition());
-
         // descriptor
         this.add(new RobotResource("descriptor", robotDescriptor));
 
@@ -83,8 +80,8 @@ public class RobotCoapProcess extends CoapServer {
 
         // actuators
         this.add(new CameraSwitchActuatorResource("camera", robotCameraSwitchActuator));
-        this.add(new ModeActuatorResource("mode", robotModeActuator));
-        this.add(new ReturnHomeActuatorResource("home", robotReturnHomeActuator));
+        this.add(new ModeActuatorResource("mode", robotModeActuator, robotIndoorPositionSensor, robotBatteryLevelSensor));
+        this.add(new ReturnHomeActuatorResource("home", robotReturnHomeActuator, robotIndoorPositionSensor));
     }
 
     public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {

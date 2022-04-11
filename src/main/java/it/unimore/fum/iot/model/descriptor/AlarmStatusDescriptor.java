@@ -7,30 +7,30 @@ import java.util.Arrays;
  * @project SMART-HOME-robot-security
  * @created 11/04/2022 - 09:18
  */
-public class AlarmDescriptor {
+public class AlarmStatusDescriptor {
 
     // object's parameters
-    private boolean activeAlarm;
-    private boolean soundAlarm;
+    private int activeAlarm; // 0 - OFF, 1 - ON
+    private int soundAlarm; // 0 - OFF, 1 - ON
 
-    public AlarmDescriptor(boolean activeAlarm, boolean soundAlarm) {
+    public AlarmStatusDescriptor(int activeAlarm, int soundAlarm) {
         this.activeAlarm = activeAlarm;
         this.soundAlarm = soundAlarm;
     }
 
-    public boolean isActiveAlarm() {
+    public int getActiveAlarm() {
         return activeAlarm;
     }
 
-    public void setActiveAlarm(boolean activeAlarm) {
+    public void setActiveAlarm(int activeAlarm) {
         this.activeAlarm = activeAlarm;
     }
 
-    public boolean isSoundAlarm() {
+    public int getSoundAlarm() {
         return soundAlarm;
     }
 
-    public void setSoundAlarm(boolean soundAlarm) {
+    public void setSoundAlarm(int soundAlarm) {
         this.soundAlarm = soundAlarm;
     }
 

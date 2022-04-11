@@ -51,11 +51,11 @@ public class PresenceMonitoringObjectResource extends CoapResource {
             SenMLRecord senMLRecord1 = new SenMLRecord();
             senMLRecord1.setBn("descriptor");
             senMLRecord1.setN("presenceId");
-            senMLRecord1.setN(this.presenceMonitoringObjectDescriptor.getPresenceId());
+            senMLRecord1.setVs(this.presenceMonitoringObjectDescriptor.getPresenceId());
 
             SenMLRecord senMLRecord2 = new SenMLRecord();
             senMLRecord2.setN("room");
-            senMLRecord2.setN(this.presenceMonitoringObjectDescriptor.getRoom());
+            senMLRecord2.setVs(this.presenceMonitoringObjectDescriptor.getRoom());
 
             SenMLRecord senMLRecord3 = new SenMLRecord();
             senMLRecord3.setN("softwareVersion");
@@ -63,7 +63,7 @@ public class PresenceMonitoringObjectResource extends CoapResource {
 
             SenMLRecord senMLRecord4 = new SenMLRecord();
             senMLRecord4.setN("manufacturer");
-            senMLRecord4.setN(this.presenceMonitoringObjectDescriptor.getManufacturer());
+            senMLRecord4.setVs(this.presenceMonitoringObjectDescriptor.getManufacturer());
 
             senMLPack.add(senMLRecord1);
             senMLPack.add(senMLRecord2);

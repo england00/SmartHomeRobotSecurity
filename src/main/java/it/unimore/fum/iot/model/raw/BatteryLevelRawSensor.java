@@ -115,7 +115,7 @@ public class BatteryLevelRawSensor extends GeneralDescriptor<Double> {
                                 batteryLevel = 100.0;
                             }
                         } else {
-                            batteryLevel = 100.0;
+                            batteryLevel = 0.0;
                         }
                     }
 
