@@ -1,6 +1,9 @@
 package it.unimore.fum.iot.client;
 
 import com.google.gson.Gson;
+import it.unimore.fum.iot.model.descriptor.AlarmDescriptor;
+import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
+import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.request.MakeCameraSwitchRequest;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.utils.SenMLRecord;
@@ -13,8 +16,7 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.plaf.TreeUI;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -29,6 +31,7 @@ public class DataManager {
     private final boolean alarmState = false;
 
     // endpoints
+    // robot
     private static final String ROBOT_DESCRIPTOR = "coap://127.0.0.1:5683/descriptor";
     private static final String ROBOT_BATTERY_LEVEL_SENSOR = "coap://127.0.0.1:5683/battery";
     private static final String ROBOT_INDOOR_POSITION_SENSOR = "coap://127.0.0.1:5683/position";
@@ -36,10 +39,29 @@ public class DataManager {
     private static final String ROBOT_CAMERA_SWITCH_ACTUATOR = "coap://127.0.0.1:5683/camera";
     private static final String ROBOT_MODE_ACTUATOR = "coap://127.0.0.1:5683/mode";
 
+    // presence
+    private static final String PRESENCE_MONITORING_DESCRIPTOR = "coap://127.0.0.1:5684/descriptor";
+
+    // charger
+    private static final String CHARGING_STATION_DESCRIPTOR = "coap://127.0.0.1:5685/descriptor";
+
     private static Map<String, CoapObserveRelation> observingRelationMap = null;
-    private static Number battery = 100;
+
+    // functional variables
+    private static AlarmDescriptor alarmDescriptor;
+
+    private static Number battery;
+    private static Boolean presence;
 
     public static void main(String[] args) {
+
+        alarmDescriptor = new AlarmDescriptor(true, true);
+        writeAlarmStateToFile();
+
+        if (alarmDescriptor.isActiveAlarm())
+            AlarmOn();
+
+        /*
 
         // init
         logger.info("ACTIVATING DATA MANAGER");
@@ -67,7 +89,7 @@ public class DataManager {
                     t.run(AlarmOn);
                 }
 
-                 */
+
 
             } else if (select == 1) {
                 logger.info("DEACTIVATING ALARM");
@@ -79,6 +101,9 @@ public class DataManager {
 
         // close the reading stream from stdin
         reader.close();
+
+         */
+
 
 
 
@@ -111,9 +136,6 @@ public class DataManager {
         } while (true);
 
         */
-
-
-
     }
 
     private static void AlarmOn() {
@@ -124,11 +146,21 @@ public class DataManager {
         //Initialize coapClient
         CoapClient coapClient = new CoapClient();
 
+        Scanner reader = new Scanner(System.in);
+        int select;
         Gson gson = new Gson();
 
         do {
+            // initializing variables
+            battery = 100.0;
+            presence = false;
 
             // first stage
+            // presence
+            GetClientProcess(coapClient, PRESENCE_MONITORING_DESCRIPTOR, true);
+            // charger
+            GetClientProcess(coapClient, CHARGING_STATION_DESCRIPTOR, true);
+            // robot
             GetClientProcess(coapClient, ROBOT_DESCRIPTOR, true);
             PutClientProcess(coapClient, ROBOT_MODE_ACTUATOR, gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
             PutClientProcess(coapClient, ROBOT_CAMERA_SWITCH_ACTUATOR, gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)));
@@ -138,7 +170,19 @@ public class DataManager {
 
             //Sleep and then cancel registrations
             do {
-                logger.info(String.valueOf(battery.doubleValue()));
+                // activating alarm
+                if (presence.equals(true)) {
+                    logger.warn("ALARM");
+                }
+
+
+                readAlarmStateFromFile();
+                if (!alarmDescriptor.isSoundAlarm()) {
+                    presence = false;
+                }
+                logger.info(String.valueOf(alarmDescriptor));
+
+
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -149,11 +193,7 @@ public class DataManager {
             observingRelationMap.forEach((key, value) -> {
                 logger.info("Canceling Observation for target Url: {}", key);
                 value.proactiveCancel();
-
-
             });
-
-
 
             break;
 
@@ -181,14 +221,40 @@ public class DataManager {
             @Override
             public void onLoad(CoapResponse response) {
                 String content = response.getResponseText();
+
+                // battery resource
                 if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/battery")) {
-                    SenMLRecord senMLRecord1 = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
-                    battery = senMLRecord1.getV();
+                    if (useSenml) {
+                        SenMLRecord senMLRecord = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
+                        battery = senMLRecord.getV();
+                    } else {
+                        BatteryLevelRawSensor batteryLevelRawSensor = gson.fromJson(content.replace("BatteryLevelRawSensor", "").trim(), BatteryLevelRawSensor.class);
+                        battery = batteryLevelRawSensor.getBatteryLevel();
+                    }
+                    if (battery.doubleValue() > 10) {
+                        //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
+                        logger.info("NOTIFICATION Body: " + content);
+                    }
                 }
-                if (battery.doubleValue() > 10) {
-                    logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
-                    //logger.info("NOTIFICATION Body: " + content);
+
+                // presence
+                else if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/presence")) {
+                    if (useSenml && presence.equals(false)) {
+                        SenMLRecord senMLRecord = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
+                        presence = senMLRecord.getVb();
+                    } else if (presence.equals(false)){
+                        PresenceRawSensor presenceRawSensor = gson.fromJson(content.replace("PresenceRawSensor", "").trim(), PresenceRawSensor.class);
+                        presence = presenceRawSensor.getValue();
+                    }
+                    //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
+                    logger.info("NOTIFICATION Body: " + content);
                 }
+
+                else {
+                    //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
+                    logger.info("NOTIFICATION Body: " + content);
+                }
+
             }
 
             @Override
@@ -263,5 +329,42 @@ public class DataManager {
         } catch (ConnectorException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void writeAlarmStateToFile() {
+        // new file object
+        File file = new File("./src/main/java/it/unimore/fum/iot/client/alarm.txt");
+        BufferedWriter bw = null;
+
+        try {
+            // create new BufferedWriter for the output file
+            bw = new BufferedWriter(new FileWriter(file));
+            bw.write(String.valueOf(alarmDescriptor));
+            bw.newLine();
+            bw.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void readAlarmStateFromFile() {
+        Gson gson = new Gson();
+
+        // new file object
+        File file = new File("./src/main/java/it/unimore/fum/iot/client/alarm.txt");
+        BufferedReader br = null;
+
+        try {
+            // create BufferedReader object from the File
+            br = new BufferedReader(new FileReader(file));
+            String line = br.readLine();
+            alarmDescriptor = gson.fromJson(line.replace("AlarmDescriptor", "").trim(), AlarmDescriptor.class);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
     }
 }

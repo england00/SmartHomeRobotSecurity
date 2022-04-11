@@ -1,6 +1,5 @@
 package it.unimore.fum.iot.server;
 
-import ch.qos.logback.classic.Level;
 import it.unimore.fum.iot.exception.*;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import it.unimore.fum.iot.model.descriptor.RobotDescriptor;

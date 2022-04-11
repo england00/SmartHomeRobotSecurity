@@ -31,8 +31,8 @@ public class IndoorPositionRawSensor extends GeneralDescriptor<Double[]> {
     private boolean returnFlag = false;
 
     // variables associated to data update
-    public static final long UPDATE_PERIOD = 1000;
-    private static final long TASK_DELAY_TIME = 1000;
+    public static final long UPDATE_PERIOD = 5000;
+    private static final long TASK_DELAY_TIME = 5000;
 
     public IndoorPositionRawSensor(String robotId, Number version, double[] roomDimensions, double[] origin) {
         super(robotId, version);
