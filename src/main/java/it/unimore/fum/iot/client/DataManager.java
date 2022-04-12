@@ -1,10 +1,15 @@
 package it.unimore.fum.iot.client;
 
 import com.google.gson.Gson;
+import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.*;
 import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
 import it.unimore.fum.iot.model.raw.IndoorPositionRawSensor;
 import it.unimore.fum.iot.model.raw.PresenceRawSensor;
+import it.unimore.fum.iot.persistence.IManager;
+import it.unimore.fum.iot.persistence.objects.ChargingStationsManager;
+import it.unimore.fum.iot.persistence.objects.PresenceMonitoringObjectsManager;
+import it.unimore.fum.iot.persistence.objects.RobotsManager;
 import it.unimore.fum.iot.request.MakeCameraSwitchRequest;
 import it.unimore.fum.iot.request.MakeModeRequest;
 import it.unimore.fum.iot.request.MakeReturnHomeRequest;
@@ -34,23 +39,36 @@ public class DataManager {
     // functional variables
     private static AlarmStatusDescriptor alarmStatusDescriptor;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ManagerException {
 
         // initializing and saving alarm status
         alarmStatusDescriptor = new AlarmStatusDescriptor(1, 1);
         writeAlarmStateToFile();
 
-        String robotIp = "127.0.0.1:5683";
-        String presenceIp = "127.0.0.1:5684";
-        String chargerIp = "127.0.0.1:5685";
-        int n = 1;
+        IManager robotsManager = new RobotsManager();
+        int nRobots = robotsManager.getObjectsList().size();
+        final List<String> robotAddress = robotsManager.getObjectsList();
+
+        IManager presenceMonitoringObjectsManager = new PresenceMonitoringObjectsManager();
+        int nPresenceMonitoringObjects = presenceMonitoringObjectsManager.getObjectsList().size();
+        final List<String> presenceMonitoringObjectAddress = presenceMonitoringObjectsManager.getObjectsList();
+
+        IManager chargingStationsManager = new ChargingStationsManager();
+        int nChargingStations = chargingStationsManager.getObjectsList().size();
+        final List<String> chargingStationsAddress = chargingStationsManager.getObjectsList();
+
+        if (nRobots != nPresenceMonitoringObjects || nRobots != nChargingStations) {
+            logger.warn("ERROR. The number of saved ROBOT IPs doesn't match the number of saved PRESENCE MONITORING OBJECT IPs or CHARGING STATION IPs.");
+        }
 
         ArrayList<Thread> threads = new ArrayList();
 
         do {
             if (alarmStatusDescriptor.getActiveAlarm() == 1) {
-                for (int i = 0; i < n; i++) { // un'iterazione per ogni robot che hai
-                    Thread t = new Thread(() -> AlarmOn(robotIp, presenceIp, chargerIp));// ho passato al costruttore di thread una lambda function
+                for (int i = 0; i < nRobots; i++) { // un'iterazione per ogni robot che hai
+
+                    int finalI = i;
+                    Thread t = new Thread(() -> AlarmOn(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
                     threads.add(t);
                     t.start();
                 }
@@ -59,8 +77,10 @@ public class DataManager {
                     t.join();
                 }
             } else if (alarmStatusDescriptor.getActiveAlarm() == 0) {
-                for (int i = 0; i < n; i++) { // un'iterazione per ogni robot che hai
-                    Thread t = new Thread(() -> AlarmOff(robotIp, presenceIp, chargerIp));// ho passato al costruttore di thread una lambda function
+                for (int i = 0; i < nRobots; i++) { // un'iterazione per ogni robot che hai
+
+                    int finalI = i;
+                    Thread t = new Thread(() -> AlarmOff(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
                     threads.add(t);
                     t.start();
                 }
@@ -103,7 +123,7 @@ public class DataManager {
 
             if (!alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getChargerRoom()) || !alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getPresenceRoom())) {
                 logger.error("ERROR. PRESENCE MONITORING OBJECT or CHARGING STATION in different room then ROBOT");
-                break;
+                System.exit(0);
             }
 
             PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
@@ -216,6 +236,19 @@ public class DataManager {
         observingRelationMap = new HashMap<>();
 
         GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+
+        // presence
+        GetClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
+        // charger
+        GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+        // robot
+        GetClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
+
+        if (!alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getChargerRoom()) || !alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getPresenceRoom())) {
+            logger.error("ERROR. PRESENCE MONITORING OBJECT or CHARGING STATION in different room then ROBOT");
+            System.exit(0);
+        }
+
         PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
         PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
         ObservingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);

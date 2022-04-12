@@ -1,4 +1,4 @@
-package it.unimore.fum.iot.client;
+package it.unimore.fum.iot.test.client;
 
 import com.google.gson.Gson;
 import it.unimore.fum.iot.utils.SenMLRecord;

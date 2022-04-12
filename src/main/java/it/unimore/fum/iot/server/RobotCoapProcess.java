@@ -4,13 +4,12 @@ import it.unimore.fum.iot.exception.*;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
 import it.unimore.fum.iot.model.raw.*;
-import it.unimore.fum.iot.persistence.IRoomsManager;
-import it.unimore.fum.iot.persistence.RoomsManager;
+import it.unimore.fum.iot.persistence.*;
+import it.unimore.fum.iot.persistence.objects.RoomsManager;
 import it.unimore.fum.iot.resource.robot.*;
 import org.eclipse.californium.core.CoapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.UUID;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -24,16 +23,20 @@ public class RobotCoapProcess extends CoapServer {
     public RobotCoapProcess() throws ManagerException, ManagerConflict {
 
         super();
-        String robotId = String.format("robot-%s", UUID.randomUUID().toString());
+        String robotId = "robot-0001";
 
         logger.info(String.valueOf(logger.isDebugEnabled()));
+
+        // robotIp
+        //IManager robotsManager = new RobotsManager();
+        //robotsManager.createNewObject(robotId, "127.0.0.1", "5683");
+        //robotsManager.hashMapToTextFile();
 
         // room
         RoomDescriptor roomDescriptor = Room();
 
         // object
         RobotDescriptor robotDescriptor = new RobotDescriptor(robotId, roomDescriptor.getRoom(), 5.0, "Phillips");
-        logger.info(String.valueOf(robotDescriptor));
 
         // resources creation
         ResourcesCreation(roomDescriptor, robotDescriptor);

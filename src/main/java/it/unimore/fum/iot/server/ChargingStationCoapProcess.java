@@ -8,7 +8,7 @@ import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
 import it.unimore.fum.iot.model.raw.EnergyConsumptionRawSensor;
 import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.persistence.IRoomsManager;
-import it.unimore.fum.iot.persistence.RoomsManager;
+import it.unimore.fum.iot.persistence.objects.RoomsManager;
 import it.unimore.fum.iot.resource.charger.ChargingStationResource;
 import it.unimore.fum.iot.resource.charger.EnergyConsumptionSensorResource;
 import it.unimore.fum.iot.resource.charger.RobotBatteryLevelSensorResource;
@@ -16,7 +16,6 @@ import it.unimore.fum.iot.resource.charger.RobotPresenceSensorResource;
 import org.eclipse.californium.core.CoapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.UUID;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -30,7 +29,12 @@ public class ChargingStationCoapProcess extends CoapServer {
     public ChargingStationCoapProcess(int port) throws ManagerException, ManagerConflict {
 
         super(port);
-        String chargerId = String.format("charger-%s", UUID.randomUUID().toString());
+        String chargerId = "charger-0001";
+
+        // chargerIp
+        //IManager chargingStationManager = new ChargingStationsManager();
+        //chargingStationManager.createNewObject(chargerId, "127.0.0.1", "5685");
+        //chargingStationManager.hashMapToTextFile();
 
         // room
         RoomDescriptor roomDescriptor = Room();

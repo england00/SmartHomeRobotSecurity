@@ -1,1 +1,1 @@
-AlarmDescriptor{activeAlarm='2', soundAlarm='1'}
+AlarmDescriptor{activeAlarm='1', soundAlarm='1'}

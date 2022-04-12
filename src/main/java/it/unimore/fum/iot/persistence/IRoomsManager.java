@@ -3,7 +3,6 @@ package it.unimore.fum.iot.persistence;
 import it.unimore.fum.iot.exception.ManagerConflict;
 import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,6 +22,7 @@ public interface IRoomsManager {
 
     // READ THE LIST of all the rooms
     public List<RoomDescriptor> getRoomsList() throws ManagerException;
+
     // READ a single room
     public RoomDescriptor getRoom(String room) throws ManagerException;
 

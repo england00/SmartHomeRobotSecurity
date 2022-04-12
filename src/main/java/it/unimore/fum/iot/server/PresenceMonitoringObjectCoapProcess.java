@@ -6,13 +6,12 @@ import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import it.unimore.fum.iot.model.descriptor.PresenceMonitoringObjectDescriptor;
 import it.unimore.fum.iot.model.raw.PresenceRawSensor;
 import it.unimore.fum.iot.persistence.IRoomsManager;
-import it.unimore.fum.iot.persistence.RoomsManager;
+import it.unimore.fum.iot.persistence.objects.RoomsManager;
 import it.unimore.fum.iot.resource.presence.PassiveInfraRedSensorResource;
 import it.unimore.fum.iot.resource.presence.PresenceMonitoringObjectResource;
 import org.eclipse.californium.core.CoapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.UUID;
 
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
@@ -26,7 +25,12 @@ public class PresenceMonitoringObjectCoapProcess extends CoapServer {
     public PresenceMonitoringObjectCoapProcess(int port) throws ManagerException, ManagerConflict {
 
         super(port);
-        String presenceId = String.format("presence-%s", UUID.randomUUID().toString());
+        String presenceId = "presence-0001";
+
+        // presenceIp
+        //IManager presenceMonirotingObjectsManager = new PresenceMonitoringObjectsManager();
+        //presenceMonirotingObjectsManager.createNewObject(presenceId, "127.0.0.1", "5684");
+        //presenceMonirotingObjectsManager.hashMapToTextFile();
 
         // room
         RoomDescriptor roomDescriptor = Room();
