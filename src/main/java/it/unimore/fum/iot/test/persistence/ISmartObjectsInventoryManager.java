@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.test.persistence;
 
-import it.unimore.fum.iot.exception.RoomsManagerConflict;
-import it.unimore.fum.iot.exception.RoomsManagerException;
+import it.unimore.fum.iot.exception.ManagerConflict;
+import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.ChargingStationDescriptor;
 import it.unimore.fum.iot.model.descriptor.PresenceMonitoringObjectDescriptor;
 import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
@@ -18,70 +18,70 @@ public interface ISmartObjectsInventoryManager {
     // Charging Station management
 
     // READ THE LIST of all the charging stations
-    List<ChargingStationDescriptor> getChargingStationsList() throws RoomsManagerException;
+    List<ChargingStationDescriptor> getChargingStationsList() throws ManagerException;
 
     // READ THE LIST of all the charging stations by room
-    List<ChargingStationDescriptor> getChargingStationsListByRoom(String room) throws RoomsManagerException;
+    List<ChargingStationDescriptor> getChargingStationsListByRoom(String room) throws ManagerException;
 
     // READ a single charging station by ID
-    Optional<ChargingStationDescriptor> getChargingStation(String chargerId) throws RoomsManagerException;
+    Optional<ChargingStationDescriptor> getChargingStation(String chargerId) throws ManagerException;
 
     // READ a single charging station by ROOM
-    Optional<ChargingStationDescriptor> getChargingStationByRoom(String room) throws RoomsManagerException;
+    Optional<ChargingStationDescriptor> getChargingStationByRoom(String room) throws ManagerException;
 
     // CREATE a new charging station
-    ChargingStationDescriptor createNewChargingStation(ChargingStationDescriptor chargingStationDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    ChargingStationDescriptor createNewChargingStation(ChargingStationDescriptor chargingStationDescriptor) throws ManagerException, ManagerConflict;
 
     // UPDATE a single charging station
-    ChargingStationDescriptor updateChargingStation(ChargingStationDescriptor chargingStationDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    ChargingStationDescriptor updateChargingStation(ChargingStationDescriptor chargingStationDescriptor) throws ManagerException, ManagerConflict;
 
     // DELETE a single charging station
-    ChargingStationDescriptor deleteChargingStation(String chargerId) throws RoomsManagerException;
+    ChargingStationDescriptor deleteChargingStation(String chargerId) throws ManagerException;
 
     // Presence Monitoring management
 
     // READ THE LIST of all the presence monitoring objects
-    List<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectsList() throws RoomsManagerException;
+    List<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectsList() throws ManagerException;
 
     // READ THE LIST of all the presence monitoring objects by room
-    List<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectsListByRoom(String room) throws RoomsManagerException;
+    List<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectsListByRoom(String room) throws ManagerException;
 
     // READ a single presence monitoring object by ID
-    public Optional<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObject(String presenceId) throws RoomsManagerException;
+    public Optional<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObject(String presenceId) throws ManagerException;
 
     // READ a single presence monitoring object by ROOM
-    public Optional<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectByRoom(String room) throws RoomsManagerException;
+    public Optional<PresenceMonitoringObjectDescriptor> getPresenceMonitoringObjectByRoom(String room) throws ManagerException;
 
     // CREATE a new presence monitoring object
-    public PresenceMonitoringObjectDescriptor createNewPresenceMonitoringObject(PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public PresenceMonitoringObjectDescriptor createNewPresenceMonitoringObject(PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor) throws ManagerException, ManagerConflict;
 
     // UPDATE a single presence monitoring object
-    public PresenceMonitoringObjectDescriptor updateChargingStation(PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public PresenceMonitoringObjectDescriptor updateChargingStation(PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor) throws ManagerException, ManagerConflict;
 
     // DELETE a single presence monitoring object
-    public PresenceMonitoringObjectDescriptor deletePresenceMonitoringObject(String presenceId) throws RoomsManagerException;
+    public PresenceMonitoringObjectDescriptor deletePresenceMonitoringObject(String presenceId) throws ManagerException;
 
     // Robot
 
     // READ THE LIST of all the robots
-    public List<RobotDescriptor> getRobotsList() throws RoomsManagerException;
+    public List<RobotDescriptor> getRobotsList() throws ManagerException;
 
     // READ THE LIST of all the robots by room
-    public List<RobotDescriptor> getRobotsListByRoom(String room) throws RoomsManagerException;
+    public List<RobotDescriptor> getRobotsListByRoom(String room) throws ManagerException;
 
     // READ a single robot by ID
-    public Optional<RobotDescriptor> getRobot(String robotId) throws RoomsManagerException;
+    public Optional<RobotDescriptor> getRobot(String robotId) throws ManagerException;
 
     // READ a single robot by ROOM
-    public Optional<RobotDescriptor> getRobotByRoom(String room) throws RoomsManagerException;
+    public Optional<RobotDescriptor> getRobotByRoom(String room) throws ManagerException;
 
     // CREATE a new presence monitoring object
-    public RobotDescriptor createNewRobot(RobotDescriptor robotDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public RobotDescriptor createNewRobot(RobotDescriptor robotDescriptor) throws ManagerException, ManagerConflict;
 
     // UPDATE a single presence monitoring object
-    public RobotDescriptor updateRobot(RobotDescriptor robotDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public RobotDescriptor updateRobot(RobotDescriptor robotDescriptor) throws ManagerException, ManagerConflict;
 
     // DELETE a single presence monitoring object
-    public RobotDescriptor deleteRobot(String robotId) throws RoomsManagerException;
+    public RobotDescriptor deleteRobot(String robotId) throws ManagerException;
 
 }

@@ -31,45 +31,56 @@ public class DataManager {
     // client's utilities
     private final static Logger logger = LoggerFactory.getLogger(DataManager.class);
 
-    // endpoints
-    // robot
-    private static final String ROBOT_DESCRIPTOR = "coap://127.0.0.1:5683/descriptor";
-    private static final String ROBOT_BATTERY_LEVEL_SENSOR = "coap://127.0.0.1:5683/battery";
-    private static final String ROBOT_INDOOR_POSITION_SENSOR = "coap://127.0.0.1:5683/position";
-    private static final String ROBOT_PRESENCE_SENSOR = "coap://127.0.0.1:5683/presence";
-    private static final String ROBOT_CAMERA_SWITCH_ACTUATOR = "coap://127.0.0.1:5683/camera";
-    private static final String ROBOT_MODE_ACTUATOR = "coap://127.0.0.1:5683/mode";
-    private static final String ROBOT_RETURN_HOME_ACTUATOR = "coap://127.0.0.1:5683/home";
-
-    // presence
-    private static final String PRESENCE_MONITORING_DESCRIPTOR = "coap://127.0.0.1:5684/descriptor";
-    private static final String PRESENCE_MONITORING_PIR_SENSOR = "coap://127.0.0.1:5684/pir";
-
-    // charger
-    private static final String CHARGING_STATION_DESCRIPTOR = "coap://127.0.0.1:5685/descriptor";
-    private static final String CHARGING_ROBOT_PRESENCE_SENSOR = "coap://127.0.0.1:5685/robot_presence";
-    private static final String CHARGING_ROBOT_BATTERY_LEVEL_SENSOR = "coap://127.0.0.1:5685/recharging_battery";
-    private static final String CHARGING_ENERGY_CONSUMPTION_SENSOR = "coap://127.0.0.1:5685/energy_consumption";
-
     // functional variables
     private static AlarmStatusDescriptor alarmStatusDescriptor;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         // initializing and saving alarm status
         alarmStatusDescriptor = new AlarmStatusDescriptor(1, 1);
         writeAlarmStateToFile();
 
-        if (alarmStatusDescriptor.getActiveAlarm() == 1)
-            AlarmOn();
+        String robotIp = "127.0.0.1:5683";
+        String presenceIp = "127.0.0.1:5684";
+        String chargerIp = "127.0.0.1:5685";
+        int n = 1;
 
+        ArrayList<Thread> threads = new ArrayList();
 
+        do {
+            if (alarmStatusDescriptor.getActiveAlarm() == 1) {
+                for (int i = 0; i < n; i++) { // un'iterazione per ogni robot che hai
+                    Thread t = new Thread(() -> AlarmOn(robotIp, presenceIp, chargerIp));// ho passato al costruttore di thread una lambda function
+                    threads.add(t);
+                    t.start();
+                }
+
+                for (Thread t : threads) {
+                    t.join();
+                }
+            } else if (alarmStatusDescriptor.getActiveAlarm() == 0) {
+                for (int i = 0; i < n; i++) { // un'iterazione per ogni robot che hai
+                    Thread t = new Thread(() -> AlarmOff(robotIp, presenceIp, chargerIp));// ho passato al costruttore di thread una lambda function
+                    threads.add(t);
+                    t.start();
+                }
+
+                for (Thread t : threads) {
+                    t.join();
+                }
+            }
+
+            else
+                System.exit(0);
+        } while (true);
     }
 
+    private static void AlarmOn(String robotIp, String presenceIp, String chargerIp) {
 
-    private static void AlarmOn() {
-
-        AlarmOnDescriptor alarmOnDescriptor = new AlarmOnDescriptor();
+        AlarmDataDescriptor alarmDataDescriptor = new AlarmDataDescriptor();
+        AddressDescriptor addressDescriptor = new AddressDescriptor(robotIp, presenceIp, chargerIp);
+        Gson gson = new Gson();
+        boolean exit = false;
 
         // map which contains the active observing resources
         Map<String, CoapObserveRelation> observingRelationMap;
@@ -77,41 +88,47 @@ public class DataManager {
         // initialize coapClient
         CoapClient coapClient = new CoapClient();
 
-        Gson gson = new Gson();
+        logger.info("ACTIVATE ALARM");
 
         do {
             observingRelationMap = new HashMap<>();
 
             // FIRST STAGE
             // presence
-            GetClientProcess(coapClient, PRESENCE_MONITORING_DESCRIPTOR, true, alarmOnDescriptor);
+            GetClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
             // charger
-            GetClientProcess(coapClient, CHARGING_STATION_DESCRIPTOR, true, alarmOnDescriptor);
+            GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
             // robot
-            GetClientProcess(coapClient, ROBOT_DESCRIPTOR, true, alarmOnDescriptor);
+            GetClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
 
-            if (!alarmOnDescriptor.getRobotRoom().equals(alarmOnDescriptor.getChargerRoom()) || !alarmOnDescriptor.getRobotRoom().equals(alarmOnDescriptor.getPresenceRoom())) {
+            if (!alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getChargerRoom()) || !alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getPresenceRoom())) {
                 logger.error("ERROR. PRESENCE MONITORING OBJECT or CHARGING STATION in different room then ROBOT");
                 break;
             }
 
-            PutClientProcess(coapClient, ROBOT_MODE_ACTUATOR, gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
-            PutClientProcess(coapClient, ROBOT_CAMERA_SWITCH_ACTUATOR, gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)));
-            ObservingClientProcess(coapClient, ROBOT_INDOOR_POSITION_SENSOR, true,  observingRelationMap, alarmOnDescriptor);
-            ObservingClientProcess(coapClient, ROBOT_BATTERY_LEVEL_SENSOR, true, observingRelationMap, alarmOnDescriptor);
-            ObservingClientProcess(coapClient, ROBOT_PRESENCE_SENSOR, true, observingRelationMap, alarmOnDescriptor);
+            PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
+            PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)));
+            ObservingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
+            ObservingClientProcess(coapClient, addressDescriptor.getRobot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            ObservingClientProcess(coapClient, addressDescriptor.getRobot_presence_sensor(), true, observingRelationMap, alarmDataDescriptor);
 
             boolean control = true;
             // cycle with sleep and then cancel registrations
             do {
                 // activating alarm
-                if (alarmOnDescriptor.getPresence().equals(true)) {
+                if (alarmDataDescriptor.getPresence().equals(true)) {
                     logger.warn("ALARM");
                 }
 
                 readAlarmStateFromFile();
                 if (alarmStatusDescriptor.getSoundAlarm() == 0) {
-                    alarmOnDescriptor.setPresence(false);
+                    alarmDataDescriptor.setPresence(false);
+                }
+
+                // checking the alarm state
+                if (alarmStatusDescriptor.getActiveAlarm() != 1) {
+                    exit = true;
+                    break;
                 }
 
                 try {
@@ -121,12 +138,12 @@ public class DataManager {
                 }
 
                 // SECOND STAGE
-                if (alarmOnDescriptor.getBattery().doubleValue() < 10 && control) {
-                    PutClientProcess(coapClient, ROBOT_RETURN_HOME_ACTUATOR, gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmOnDescriptor.getChargerPosition())));
+                if (alarmDataDescriptor.getBattery().doubleValue() < 10 && control) {
+                    PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
                     control = false;
                 }
 
-            } while (!Arrays.equals(alarmOnDescriptor.getCurrentRobotPosition(), alarmOnDescriptor.getChargerPosition()));
+            } while (!Arrays.equals(alarmDataDescriptor.getCurrentRobotPosition(), alarmDataDescriptor.getChargerPosition()));
 
             observingRelationMap.forEach((key, value) -> {
                 logger.info("Canceling Observation for target Url: {}", key);
@@ -135,28 +152,34 @@ public class DataManager {
 
             observingRelationMap = new HashMap<>();
 
-            GetClientProcess(coapClient, CHARGING_ROBOT_PRESENCE_SENSOR, true, alarmOnDescriptor);
-            if (alarmOnDescriptor.getChargerRobotPresence()) {
-                PutClientProcess(coapClient, ROBOT_MODE_ACTUATOR, gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_PAUSE)));
-                PutClientProcess(coapClient, ROBOT_CAMERA_SWITCH_ACTUATOR, gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
-                PutClientProcess(coapClient, ROBOT_RETURN_HOME_ACTUATOR, gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, null)));
+            GetClientProcess(coapClient, addressDescriptor.getCharging_robot_presence_sensor(), true, alarmDataDescriptor);
+            if (alarmDataDescriptor.getChargerRobotPresence()) {
+                PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_PAUSE)));
+                PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
+                PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, null)));
             }
 
             // THIRD STAGE
-            ObservingClientProcess(coapClient, PRESENCE_MONITORING_PIR_SENSOR, true, observingRelationMap, alarmOnDescriptor);
-            ObservingClientProcess(coapClient, CHARGING_ROBOT_BATTERY_LEVEL_SENSOR, true, observingRelationMap, alarmOnDescriptor);
-            ObservingClientProcess(coapClient, CHARGING_ENERGY_CONSUMPTION_SENSOR, true, observingRelationMap, alarmOnDescriptor);
+            ObservingClientProcess(coapClient, addressDescriptor.getPresence_monitoring_pir_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            ObservingClientProcess(coapClient, addressDescriptor.getCharging_robot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            ObservingClientProcess(coapClient, addressDescriptor.getCharging_energy_consumption_sensor(), true, observingRelationMap, alarmDataDescriptor);
 
             // cycle with sleep and then cancel registrations
             do {
                 // activating alarm
-                if (alarmOnDescriptor.getPresence().equals(true)) {
+                if (alarmDataDescriptor.getPresence().equals(true)) {
                     logger.warn("ALARM");
                 }
 
                 readAlarmStateFromFile();
                 if (alarmStatusDescriptor.getSoundAlarm() == 0) {
-                    alarmOnDescriptor.setPresence(false);
+                    alarmDataDescriptor.setPresence(false);
+                }
+
+                // checking the alarm state
+                if (alarmStatusDescriptor.getActiveAlarm() != 1 || exit) {
+                    exit = true;
+                    break;
                 }
 
                 try {
@@ -165,20 +188,79 @@ public class DataManager {
                     e.printStackTrace();
                 }
 
-            } while (alarmOnDescriptor.getBattery().doubleValue() < 100);
+            } while (alarmDataDescriptor.getBattery().doubleValue() < 100);
 
             observingRelationMap.forEach((key, value) -> {
                 logger.info("Canceling Observation for target Url: {}", key);
                 value.proactiveCancel();
             });
 
-            break;
-
-        } while (true);
+        } while (!exit);
     }
 
+    private static void AlarmOff(String robotIp, String presenceIp, String chargerIp) {
 
-    private static void ObservingClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, Map<String, CoapObserveRelation> observingRelationMap, AlarmOnDescriptor alarmOnDescriptor) {
+        AlarmDataDescriptor alarmDataDescriptor = new AlarmDataDescriptor();
+        AddressDescriptor addressDescriptor = new AddressDescriptor(robotIp, presenceIp, chargerIp);
+        Gson gson = new Gson();
+        boolean exit = false;
+
+        // map which contains the active observing resources
+        Map<String, CoapObserveRelation> observingRelationMap;
+
+        // initialize coapClient
+        CoapClient coapClient = new CoapClient();
+
+        logger.info("DEACTIVATE ALARM");
+
+        observingRelationMap = new HashMap<>();
+
+        GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+        PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
+        PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
+        ObservingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
+
+        // cycle with sleep and then cancel registrations
+        do {
+            // checking the alarm state
+            readAlarmStateFromFile();
+            if (alarmStatusDescriptor.getActiveAlarm() != 0) {
+                exit = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        } while (!Arrays.equals(alarmDataDescriptor.getCurrentRobotPosition(), alarmDataDescriptor.getChargerPosition()));
+
+        observingRelationMap.forEach((key, value) -> {
+            logger.info("Canceling Observation for target Url: {}", key);
+            value.proactiveCancel();
+        });
+
+        PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_STOP)));
+        PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
+
+        do {
+            readAlarmStateFromFile();
+            if (alarmStatusDescriptor.getActiveAlarm() != 0 || exit) {
+                exit = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } while (!exit);
+    }
+
+    private static void ObservingClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, Map<String, CoapObserveRelation> observingRelationMap, AlarmDataDescriptor alarmDataDescriptor) {
 
         Gson gson = new Gson();
         logger.info("OBSERVING ... {}", targetUrl);
@@ -206,16 +288,16 @@ public class DataManager {
                 if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/battery") || Objects.equals(targetUrl, "coap://127.0.0.1:5685/recharging_battery")) {
                     if (useSenml) {
                         SenMLRecord senMLRecord = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
-                        alarmOnDescriptor.setBattery(senMLRecord.getV());
+                        alarmDataDescriptor.setBattery(senMLRecord.getV());
                     } else {
                         BatteryLevelRawSensor batteryLevelRawSensor = gson.fromJson(content.replace("BatteryLevelRawSensor", "").trim(), BatteryLevelRawSensor.class);
-                        alarmOnDescriptor.setBattery(batteryLevelRawSensor.getBatteryLevel());
+                        alarmDataDescriptor.setBattery(batteryLevelRawSensor.getBatteryLevel());
                     }
-                    if ((alarmOnDescriptor.getBattery().doubleValue() > 10) &&
+                    if ((alarmDataDescriptor.getBattery().doubleValue() > 10) &&
                             Objects.equals(targetUrl, "coap://127.0.0.1:5683/battery")) {
                         //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
                         logger.info("NOTIFICATION Body: " + content);
-                    } else if ((alarmOnDescriptor.getBattery().doubleValue() < 100) &&
+                    } else if ((alarmDataDescriptor.getBattery().doubleValue() < 100) &&
                             Objects.equals(targetUrl, "coap://127.0.0.1:5685/recharging_battery")) {
                         //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
                         logger.info("NOTIFICATION Body: " + content);
@@ -224,22 +306,22 @@ public class DataManager {
 
                 // presence
                 else if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/presence") || Objects.equals(targetUrl, "coap://127.0.0.1:5684/pir")) {
-                    if (useSenml && alarmOnDescriptor.getPresence().equals(false)) {
+                    if (useSenml && alarmDataDescriptor.getPresence().equals(false)) {
                         SenMLRecord senMLRecord = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
-                        alarmOnDescriptor.setPresence(senMLRecord.getVb());
-                        if(alarmOnDescriptor.getPresence().equals(true))
+                        alarmDataDescriptor.setPresence(senMLRecord.getVb());
+                        if(alarmDataDescriptor.getPresence().equals(true))
                             logger.warn("PRESENCE DETECTED!");
-                    } else if (alarmOnDescriptor.getPresence().equals(false)){
+                    } else if (alarmDataDescriptor.getPresence().equals(false)){
                         PresenceRawSensor presenceRawSensor = gson.fromJson(content.replace("PresenceRawSensor", "").trim(), PresenceRawSensor.class);
-                        alarmOnDescriptor.setPresence(presenceRawSensor.getValue());
-                        if(alarmOnDescriptor.getPresence().equals(true))
+                        alarmDataDescriptor.setPresence(presenceRawSensor.getValue());
+                        if(alarmDataDescriptor.getPresence().equals(true))
                             logger.warn("PRESENCE DETECTED!");
                     }
-                    if ((!Arrays.equals(alarmOnDescriptor.getCurrentRobotPosition(), alarmOnDescriptor.getChargerPosition())) &&
+                    if ((!Arrays.equals(alarmDataDescriptor.getCurrentRobotPosition(), alarmDataDescriptor.getChargerPosition())) &&
                             Objects.equals(targetUrl, "coap://127.0.0.1:5683/presence")){
                         //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
                         logger.info("NOTIFICATION Body: " + content);
-                    } else if ((alarmOnDescriptor.getBattery().doubleValue() < 100) &&
+                    } else if ((alarmDataDescriptor.getBattery().doubleValue() < 100) &&
                             Objects.equals(targetUrl, "coap://127.0.0.1:5684/pir")){
                         //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
                         logger.info("NOTIFICATION Body: " + content);
@@ -250,12 +332,12 @@ public class DataManager {
                 else if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/position")) {
                     if (useSenml) {
                         SenMLPack senMLPack = gson.fromJson(content.trim(), SenMLPack.class);
-                        alarmOnDescriptor.setCurrentRobotPosition(new double[]{senMLPack.get(1).getV().doubleValue(), senMLPack.get(2).getV().doubleValue()});
+                        alarmDataDescriptor.setCurrentRobotPosition(new double[]{senMLPack.get(1).getV().doubleValue(), senMLPack.get(2).getV().doubleValue()});
                     } else {
                         IndoorPositionRawSensor indoorPositionRawSensor = gson.fromJson(content.replace("IndoorPositionRawSensor", "").trim(), IndoorPositionRawSensor.class);
-                        alarmOnDescriptor.setCurrentRobotPosition((new double[]{indoorPositionRawSensor.getPosition()[0], indoorPositionRawSensor.getPosition()[1]}));
+                        alarmDataDescriptor.setCurrentRobotPosition((new double[]{indoorPositionRawSensor.getPosition()[0], indoorPositionRawSensor.getPosition()[1]}));
                     }
-                    if (!Arrays.equals(alarmOnDescriptor.getCurrentRobotPosition(), alarmOnDescriptor.getChargerPosition())) {
+                    if (!Arrays.equals(alarmDataDescriptor.getCurrentRobotPosition(), alarmDataDescriptor.getChargerPosition())) {
                         //logger.info("Notification Response Pretty Print: \n{}", Utils.prettyPrint(response));
                         logger.info("NOTIFICATION Body: " + content);
                     }
@@ -276,8 +358,7 @@ public class DataManager {
         observingRelationMap.put(targetUrl, relation);
     }
 
-
-    private static void GetClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, AlarmOnDescriptor alarmOnDescriptor) {
+    private static void GetClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, AlarmDataDescriptor alarmDataDescriptor) {
 
         Gson gson = new Gson();
 
@@ -310,10 +391,10 @@ public class DataManager {
             if (Objects.equals(targetUrl, "coap://127.0.0.1:5683/descriptor")) {
                 if (useSenml) {
                     SenMLPack senMLPack = gson.fromJson(content.trim(), SenMLPack.class);
-                    alarmOnDescriptor.setRobotRoom(senMLPack.get(1).getVs());
+                    alarmDataDescriptor.setRobotRoom(senMLPack.get(1).getVs());
                 } else {
                     RobotDescriptor robotDescriptor = gson.fromJson(content.replace("RobotDescriptor", "").trim(), RobotDescriptor.class);
-                    alarmOnDescriptor.setRobotRoom(robotDescriptor.getRoom());
+                    alarmDataDescriptor.setRobotRoom(robotDescriptor.getRoom());
                 }
             }
 
@@ -321,10 +402,10 @@ public class DataManager {
             else if (Objects.equals(targetUrl, "coap://127.0.0.1:5684/descriptor")) {
                 if (useSenml) {
                     SenMLPack senMLPack = gson.fromJson(content.trim(), SenMLPack.class);
-                    alarmOnDescriptor.setPresenceRoom(senMLPack.get(1).getVs());
+                    alarmDataDescriptor.setPresenceRoom(senMLPack.get(1).getVs());
                 } else {
                     PresenceMonitoringObjectDescriptor presenceMonitoringObjectDescriptor = gson.fromJson(content.replace("PresenceMonitoringObjectDescriptor", "").trim(), PresenceMonitoringObjectDescriptor.class);
-                    alarmOnDescriptor.setPresenceRoom(presenceMonitoringObjectDescriptor.getRoom());
+                    alarmDataDescriptor.setPresenceRoom(presenceMonitoringObjectDescriptor.getRoom());
                 }
             }
 
@@ -332,12 +413,12 @@ public class DataManager {
             else if (Objects.equals(targetUrl, "coap://127.0.0.1:5685/descriptor")) {
                 if (useSenml) {
                     SenMLPack senMLPack = gson.fromJson(content.trim(), SenMLPack.class);
-                    alarmOnDescriptor.setChargerRoom(senMLPack.get(1).getVs());
-                    alarmOnDescriptor.setChargerPosition(new double[]{senMLPack.get(4).getV().doubleValue(), senMLPack.get(5).getV().doubleValue()});
+                    alarmDataDescriptor.setChargerRoom(senMLPack.get(1).getVs());
+                    alarmDataDescriptor.setChargerPosition(new double[]{senMLPack.get(4).getV().doubleValue(), senMLPack.get(5).getV().doubleValue()});
                 } else {
                     ChargingStationDescriptor chargingStationDescriptor = gson.fromJson(content.replace("ChargingStationDescriptor", "").trim(), ChargingStationDescriptor.class);
-                    alarmOnDescriptor.setChargerRoom(chargingStationDescriptor.getRoom());
-                    alarmOnDescriptor.setChargerPosition(chargingStationDescriptor.getPosition());
+                    alarmDataDescriptor.setChargerRoom(chargingStationDescriptor.getRoom());
+                    alarmDataDescriptor.setChargerPosition(chargingStationDescriptor.getPosition());
                 }
             }
 
@@ -345,10 +426,10 @@ public class DataManager {
             else if (Objects.equals(targetUrl, "coap://127.0.0.1:5685/robot_presence")) {
                 if (useSenml) {
                     SenMLRecord senMLRecord = gson.fromJson(content.replace("]", "").replace("[", "").trim(), SenMLRecord.class);
-                    alarmOnDescriptor.setChargerRobotPresence(senMLRecord.getVb());
+                    alarmDataDescriptor.setChargerRobotPresence(senMLRecord.getVb());
                 } else {
                     PresenceRawSensor presenceRawSensor = gson.fromJson(content.replace("PresenceRawSensor", "").trim(), PresenceRawSensor.class);
-                    alarmOnDescriptor.setChargerRobotPresence(presenceRawSensor.getValue());
+                    alarmDataDescriptor.setChargerRobotPresence(presenceRawSensor.getValue());
                 }
             }
 
@@ -360,7 +441,6 @@ public class DataManager {
             e.printStackTrace();
         }
     }
-
 
     private static void PutClientProcess(CoapClient coapClient, String targetUrl, String requestPayload) {
 
@@ -392,7 +472,6 @@ public class DataManager {
         }
     }
 
-
     private static void writeAlarmStateToFile() {
         // new file object
         File file = new File("./src/main/java/it/unimore/fum/iot/client/alarm.txt");
@@ -410,7 +489,6 @@ public class DataManager {
         }
     }
 
-
     private static void readAlarmStateFromFile() {
         Gson gson = new Gson();
 
@@ -426,8 +504,6 @@ public class DataManager {
 
         } catch (IOException e) {
             e.printStackTrace();
-
         }
-
     }
 }

@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.server;
 
-import it.unimore.fum.iot.exception.RoomsManagerConflict;
-import it.unimore.fum.iot.exception.RoomsManagerException;
+import it.unimore.fum.iot.exception.ManagerConflict;
+import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.ChargingStationDescriptor;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 import it.unimore.fum.iot.model.raw.BatteryLevelRawSensor;
@@ -27,7 +27,7 @@ public class ChargingStationCoapProcess extends CoapServer {
 
     private final static Logger logger = LoggerFactory.getLogger(RobotCoapProcess.class);
 
-    public ChargingStationCoapProcess(int port) throws RoomsManagerException, RoomsManagerConflict {
+    public ChargingStationCoapProcess(int port) throws ManagerException, ManagerConflict {
 
         super(port);
         String chargerId = String.format("charger-%s", UUID.randomUUID().toString());
@@ -42,7 +42,7 @@ public class ChargingStationCoapProcess extends CoapServer {
         ResourcesCreation(roomDescriptor, chargingStationDescriptor);
     }
 
-    private RoomDescriptor Room() throws RoomsManagerException {
+    private RoomDescriptor Room() throws ManagerException {
 
         // take existing room from file
         IRoomsManager roomsManager = new RoomsManager();
@@ -80,7 +80,7 @@ public class ChargingStationCoapProcess extends CoapServer {
         this.add(new RobotPresenceSensorResource("robot_presence", chargerRobotPresenceSensor));
     }
 
-    public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {
+    public static void main(String[] args) throws ManagerException, ManagerConflict {
 
         // creating the server adding a new port because all the servers run on the same ip
         ChargingStationCoapProcess chargingStationCoapProcess = new ChargingStationCoapProcess(5685);

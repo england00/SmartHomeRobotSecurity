@@ -1,7 +1,7 @@
 package it.unimore.fum.iot.persistence;
 
-import it.unimore.fum.iot.exception.RoomsManagerConflict;
-import it.unimore.fum.iot.exception.RoomsManagerException;
+import it.unimore.fum.iot.exception.ManagerConflict;
+import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
 
 import java.util.HashMap;
@@ -22,16 +22,16 @@ public interface IRoomsManager {
     public void hashMapToTextFile();
 
     // READ THE LIST of all the rooms
-    public List<RoomDescriptor> getRoomsList() throws RoomsManagerException;
+    public List<RoomDescriptor> getRoomsList() throws ManagerException;
     // READ a single room
-    public RoomDescriptor getRoom(String room) throws RoomsManagerException;
+    public RoomDescriptor getRoom(String room) throws ManagerException;
 
     // CREATE a new room
-    public RoomDescriptor createNewRoom(RoomDescriptor roomDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public RoomDescriptor createNewRoom(RoomDescriptor roomDescriptor) throws ManagerException, ManagerConflict;
 
     // UPDATE a single room
-    public void updateRoom(RoomDescriptor roomDescriptor) throws RoomsManagerException, RoomsManagerConflict;
+    public void updateRoom(RoomDescriptor roomDescriptor) throws ManagerException, ManagerConflict;
 
     // DELETE a single room
-    public RoomDescriptor deleteRoom(String room) throws RoomsManagerException;
+    public RoomDescriptor deleteRoom(String room) throws ManagerException;
 }

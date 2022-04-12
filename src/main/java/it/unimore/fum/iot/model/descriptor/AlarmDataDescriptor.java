@@ -1,11 +1,13 @@
 package it.unimore.fum.iot.model.descriptor;
 
+import java.util.Arrays;
+
 /**
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
  * @created 11/04/2022 - 10:20
  */
-public class AlarmOnDescriptor {
+public class AlarmDataDescriptor {
 
     // object's parameters
     private Number battery = 100.0;
@@ -17,7 +19,7 @@ public class AlarmOnDescriptor {
     private double[] currentRobotPosition = new double[2];
     private Boolean chargerRobotPresence = false;
 
-    public AlarmOnDescriptor() {}
+    public AlarmDataDescriptor() {}
 
     public Number getBattery() {
         return battery;
@@ -85,9 +87,15 @@ public class AlarmOnDescriptor {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("AlarmDescriptor{");
+        final StringBuffer sb = new StringBuffer("AlarmDataDescriptor{");
         sb.append("battery=").append(battery);
         sb.append(", presence=").append(presence);
+        sb.append(", robotRoom'=").append(robotRoom).append('\'');
+        sb.append(", presenceRoom'=").append(presenceRoom).append('\'');
+        sb.append(", chargerRoom'=").append(chargerRoom).append('\'');
+        sb.append(", chargerPosition=").append(Arrays.toString(chargerPosition));
+        sb.append(", currentRobotPosition=").append(Arrays.toString(currentRobotPosition));
+        sb.append(", chargerRobotPresence=").append(chargerRobotPresence);
         sb.append('}');
         return sb.toString();
     }

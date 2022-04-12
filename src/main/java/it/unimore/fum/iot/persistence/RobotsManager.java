@@ -1,9 +1,10 @@
+/*
 package it.unimore.fum.iot.persistence;
 
 import com.google.gson.Gson;
 import it.unimore.fum.iot.exception.ManagerConflict;
 import it.unimore.fum.iot.exception.ManagerException;
-import it.unimore.fum.iot.model.descriptor.RoomDescriptor;
+import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
@@ -13,32 +14,32 @@ import java.util.*;
  * @author Luca Inghilterra, 271359@studenti.unimore.it
  * @project SMART-HOME-robot-security
  * @created 02/04/2022 - 20:08
- */
-public class RoomsManager implements IRoomsManager{
+
+public class RobotsManager{
 
     // storing all the data in a file through maps and lists
-    private final static String filePath = "./src/main/java/it/unimore/fum/iot/persistence/rooms.txt";
-    private HashMap<String, RoomDescriptor> roomHashMap;
+    private final static String filePath = "./src/main/java/it/unimore/fum/iot/persistence/robots.txt";
+    private HashMap<String, RobotDescriptor> robotHashMap;
     private final static Logger logger = LoggerFactory.getLogger(RoomsManager.class);
     private final Gson gson;
 
-    public RoomsManager() {
+    public RobotsManager() {
         // obtaining the map from file
         this.gson = new Gson();
-        this.roomHashMap = hashMapFromTextFile();
+        this.robotHashMap = hashMapFromTextFile();
     }
 
-    public HashMap<String, RoomDescriptor> getRoomHashMap() {
-        return roomHashMap;
+    public HashMap<String, RobotDescriptor> getRobotHashMap() {
+        return robotHashMap;
     }
 
-    public void setRoomHashMap(HashMap<String, RoomDescriptor> roomHashMap) {
-        this.roomHashMap = roomHashMap;
+    public void setRobotHashMap(HashMap<String, RobotDescriptor> robotHashMap) {
+        this.robotHashMap = robotHashMap;
     }
 
     @Override
-    public HashMap<String, RoomDescriptor> hashMapFromTextFile() {
-        HashMap<String, RoomDescriptor> map = new HashMap<>();
+    public HashMap<String, RobotDescriptor> hashMapFromTextFile() {
+        HashMap<String, RobotDescriptor> map = new HashMap<>();
         BufferedReader br = null;
 
         try {
@@ -55,11 +56,11 @@ public class RoomsManager implements IRoomsManager{
 
                 // split the line by ':'
                 String[] identifier = line.split(":");
-                String room = identifier[0].trim();
-                RoomDescriptor roomDescriptor = this.gson.fromJson(identifier[1].replace("RoomDescriptor", "").trim(), RoomDescriptor.class);
+                String robot = identifier[0].trim();
+                RobotDescriptor robotDescriptor = this.gson.fromJson(identifier[1].replace("RobotDescriptor", "").trim(), RobotDescriptor.class);
 
                 // put identificator and object in HashMap if they are not empty
-                if (!room.equals("") && !roomDescriptor.getRoom().equals("") &&
+                if (!robot.equals("") && !robotDescriptor.getRoom().equals("") &&
                         roomDescriptor.getDimensions() != null &&
                         roomDescriptor.getOrigin() != null)
                     map.put(room, roomDescriptor);
@@ -116,7 +117,7 @@ public class RoomsManager implements IRoomsManager{
         }
     }
 
-    // READ THE LIST of all the rooms
+    // READ THE LIST of all the robots
     @Override
     public List<RoomDescriptor> getRoomsList() throws ManagerException {
 
@@ -130,7 +131,7 @@ public class RoomsManager implements IRoomsManager{
         return this.roomHashMap.get(room);
     }
 
-    // CREATE a new room
+    // CREATE a new robot
     @Override
     public RoomDescriptor createNewRoom(RoomDescriptor roomDescriptor) throws ManagerException, ManagerConflict {
 
@@ -150,7 +151,7 @@ public class RoomsManager implements IRoomsManager{
         }
     }
 
-    // UPDATE a single room
+    // UPDATE a single robot
     @Override
     public void updateRoom(RoomDescriptor roomDescriptor) throws ManagerException, ManagerConflict {
 
@@ -164,10 +165,11 @@ public class RoomsManager implements IRoomsManager{
         }
     }
 
-    // DELETE a single room
+    // DELETE a single robot
     @Override
-    public RoomDescriptor deleteRoom(String room) throws ManagerException {
+    public RobotDescriptor deleteRobot(String robot) throws ManagerException {
 
-        return this.roomHashMap.remove(room);
+        return this.robotHashMap.remove(robot);
     }
 }
+*/

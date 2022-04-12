@@ -21,7 +21,7 @@ public class RobotCoapProcess extends CoapServer {
 
     private final static Logger logger = LoggerFactory.getLogger(RobotCoapProcess.class);
 
-    public RobotCoapProcess() throws RoomsManagerException, RoomsManagerConflict {
+    public RobotCoapProcess() throws ManagerException, ManagerConflict {
 
         super();
         String robotId = String.format("robot-%s", UUID.randomUUID().toString());
@@ -39,7 +39,7 @@ public class RobotCoapProcess extends CoapServer {
         ResourcesCreation(roomDescriptor, robotDescriptor);
     }
 
-    private RoomDescriptor Room() throws RoomsManagerException, RoomsManagerConflict {
+    private RoomDescriptor Room() throws ManagerException, ManagerConflict {
 
         // take existing room from file
         IRoomsManager roomsManager = new RoomsManager();
@@ -84,7 +84,7 @@ public class RobotCoapProcess extends CoapServer {
         this.add(new ReturnHomeActuatorResource("home", robotReturnHomeActuator, robotIndoorPositionSensor));
     }
 
-    public static void main(String[] args) throws RoomsManagerException, RoomsManagerConflict {
+    public static void main(String[] args) throws ManagerException, ManagerConflict {
 
         RobotCoapProcess robotCoapProcess = new RobotCoapProcess();
         robotCoapProcess.start();

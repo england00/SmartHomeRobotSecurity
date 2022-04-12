@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import it.unimore.fum.iot.exception.RoomsManagerConflict;
-import it.unimore.fum.iot.exception.RoomsManagerException;
+import it.unimore.fum.iot.exception.ManagerConflict;
+import it.unimore.fum.iot.exception.ManagerException;
 import it.unimore.fum.iot.model.descriptor.RobotDescriptor;
 
 /**
@@ -135,13 +135,13 @@ public class RobotManager {
     // Robot
 
     // READ THE LIST of all the robots
-    public List<RobotDescriptor> getRobotsList() throws RoomsManagerException {
+    public List<RobotDescriptor> getRobotsList() throws ManagerException {
 
         return new ArrayList<>(this.robotMap.values());
     }
 
     // READ THE LIST of all the robots by room
-    public List<RobotDescriptor> getRobotsListByRoom(String room) throws RoomsManagerException {
+    public List<RobotDescriptor> getRobotsListByRoom(String room) throws ManagerException {
 
         return this.robotMap.values().stream()
                 .filter(robotDescriptor -> robotDescriptor != null && robotDescriptor.getRoom().equals(room))
@@ -149,38 +149,38 @@ public class RobotManager {
     }
 
     // READ a single robot by ID
-    public Optional<RobotDescriptor> getRobot(String robotId) throws RoomsManagerException {
+    public Optional<RobotDescriptor> getRobot(String robotId) throws ManagerException {
 
         return this.robotMap.values().stream()
                 .filter(robotDescriptor -> robotDescriptor.getRobotId().equals(robotId)).findAny();
     }
 
     // READ a single robot by ROOM
-    public Optional<RobotDescriptor> getRobotByRoom(String room) throws RoomsManagerException {
+    public Optional<RobotDescriptor> getRobotByRoom(String room) throws ManagerException {
 
         return this.robotMap.values().stream()
                 .filter(robotDescriptor -> robotDescriptor.getRoom().equals(room)).findAny();
     }
 
     // CREATE a new robot
-    public RobotDescriptor createNewRobot(RobotDescriptor robotDescriptor) throws RoomsManagerException, RoomsManagerConflict {
+    public RobotDescriptor createNewRobot(RobotDescriptor robotDescriptor) throws ManagerException, ManagerConflict {
 
         if(robotDescriptor.getRobotId() != null &&
                 robotDescriptor.getRoom() != null &&
                 this.getRobot(robotDescriptor.getRobotId()).isPresent()) {
 
-            throw new RoomsManagerConflict("Robot with the same ROBOTID already available!");
+            throw new ManagerConflict("Robot with the same ROBOTID already available!");
 
         } else if(robotDescriptor.getRobotId() != null &&
                 robotDescriptor.getRoom() != null &&
                 this.getRobotByRoom(robotDescriptor.getRoom()).isPresent()) {
 
-            throw new RoomsManagerConflict("Robot in the same ROOM already available!");
+            throw new ManagerConflict("Robot in the same ROOM already available!");
 
         } else if (robotDescriptor.getRobotId() == null ||
                 robotDescriptor.getRoom() == null) {
 
-            throw new RoomsManagerConflict("Null ROBOTID or ROOM values!");
+            throw new ManagerConflict("Null ROBOTID or ROOM values!");
 
         } else {
 
@@ -190,26 +190,26 @@ public class RobotManager {
     }
 
     // UPDATE a single robot
-    public RobotDescriptor updateRobot(RobotDescriptor robotDescriptor) throws RoomsManagerException, RoomsManagerConflict {
+    public RobotDescriptor updateRobot(RobotDescriptor robotDescriptor) throws ManagerException, ManagerConflict {
 
         if(robotDescriptor.getRobotId() != null &&
                 robotDescriptor.getRoom() != null &&
                 this.getRobot(robotDescriptor.getRobotId()).isPresent() &&
                 this.getRobotByRoom(robotDescriptor.getRoom()).isEmpty()) {
 
-            throw new RoomsManagerConflict("Presence Monitoring Object with the same PRESENCEID but in different ROOM already available!");
+            throw new ManagerConflict("Presence Monitoring Object with the same PRESENCEID but in different ROOM already available!");
 
         } else if(robotDescriptor.getRobotId() != null &&
                 robotDescriptor.getRoom() != null &&
                 this.getRobot(robotDescriptor.getRobotId()).isEmpty() &&
                 this.getRobotByRoom(robotDescriptor.getRoom()).isPresent()){
 
-            throw new RoomsManagerConflict("Presence Monitoring Object in the same ROOM but with different PRESENCEID already available!");
+            throw new ManagerConflict("Presence Monitoring Object in the same ROOM but with different PRESENCEID already available!");
 
         } else if (robotDescriptor.getRobotId() == null ||
                 robotDescriptor.getRoom() == null) {
 
-            throw new RoomsManagerConflict("Null CHARGERID or ROOM values!");
+            throw new ManagerConflict("Null CHARGERID or ROOM values!");
 
         } else {
 
@@ -219,7 +219,7 @@ public class RobotManager {
     }
 
     // DELETE a single robot
-    public RobotDescriptor deleteRobot(String robotId) throws RoomsManagerException {
+    public RobotDescriptor deleteRobot(String robotId) throws ManagerException {
 
         return this.robotMap.remove(robotId);
     }
