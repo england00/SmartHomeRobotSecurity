@@ -68,7 +68,7 @@ public class DataManager {
                 for (int i = 0; i < nRobots; i++) { // un'iterazione per ogni robot che hai
 
                     int finalI = i;
-                    Thread t = new Thread(() -> AlarmOn(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
+                    Thread t = new Thread(() -> alarmOn(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
                     threads.add(t);
                     t.start();
                 }
@@ -80,7 +80,7 @@ public class DataManager {
                 for (int i = 0; i < nRobots; i++) { // un'iterazione per ogni robot che hai
 
                     int finalI = i;
-                    Thread t = new Thread(() -> AlarmOff(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
+                    Thread t = new Thread(() -> alarmOff(robotAddress.get(finalI), presenceMonitoringObjectAddress.get(finalI), chargingStationsAddress.get(finalI)));// ho passato al costruttore di thread una lambda function
                     threads.add(t);
                     t.start();
                 }
@@ -95,7 +95,7 @@ public class DataManager {
         } while (true);
     }
 
-    private static void AlarmOn(String robotIp, String presenceIp, String chargerIp) {
+    private static void alarmOn(String robotIp, String presenceIp, String chargerIp) {
 
         AlarmDataDescriptor alarmDataDescriptor = new AlarmDataDescriptor();
         AddressDescriptor addressDescriptor = new AddressDescriptor(robotIp, presenceIp, chargerIp);
@@ -115,22 +115,22 @@ public class DataManager {
 
             // FIRST STAGE
             // presence
-            GetClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
+            getClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
             // charger
-            GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+            getClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
             // robot
-            GetClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
+            getClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
 
             if (!alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getChargerRoom()) || !alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getPresenceRoom())) {
                 logger.error("ERROR. PRESENCE MONITORING OBJECT or CHARGING STATION in different room then ROBOT");
                 System.exit(0);
             }
 
-            PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
-            PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)));
-            ObservingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
-            ObservingClientProcess(coapClient, addressDescriptor.getRobot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
-            ObservingClientProcess(coapClient, addressDescriptor.getRobot_presence_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            putClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_START)));
+            putClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_ON_CAMERA)));
+            observingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
+            observingClientProcess(coapClient, addressDescriptor.getRobot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            observingClientProcess(coapClient, addressDescriptor.getRobot_presence_sensor(), true, observingRelationMap, alarmDataDescriptor);
 
             boolean control = true;
             // cycle with sleep and then cancel registrations
@@ -159,7 +159,7 @@ public class DataManager {
 
                 // SECOND STAGE
                 if (alarmDataDescriptor.getBattery().doubleValue() < 10 && control) {
-                    PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
+                    putClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
                     control = false;
                 }
 
@@ -172,17 +172,17 @@ public class DataManager {
 
             observingRelationMap = new HashMap<>();
 
-            GetClientProcess(coapClient, addressDescriptor.getCharging_robot_presence_sensor(), true, alarmDataDescriptor);
+            getClientProcess(coapClient, addressDescriptor.getCharging_robot_presence_sensor(), true, alarmDataDescriptor);
             if (alarmDataDescriptor.getChargerRobotPresence()) {
-                PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_PAUSE)));
-                PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
-                PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, null)));
+                putClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_PAUSE)));
+                putClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
+                putClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, null)));
             }
 
             // THIRD STAGE
-            ObservingClientProcess(coapClient, addressDescriptor.getPresence_monitoring_pir_sensor(), true, observingRelationMap, alarmDataDescriptor);
-            ObservingClientProcess(coapClient, addressDescriptor.getCharging_robot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
-            ObservingClientProcess(coapClient, addressDescriptor.getCharging_energy_consumption_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            observingClientProcess(coapClient, addressDescriptor.getPresence_monitoring_pir_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            observingClientProcess(coapClient, addressDescriptor.getCharging_robot_battery_level_sensor(), true, observingRelationMap, alarmDataDescriptor);
+            observingClientProcess(coapClient, addressDescriptor.getCharging_energy_consumption_sensor(), true, observingRelationMap, alarmDataDescriptor);
 
             // cycle with sleep and then cancel registrations
             do {
@@ -218,7 +218,7 @@ public class DataManager {
         } while (!exit);
     }
 
-    private static void AlarmOff(String robotIp, String presenceIp, String chargerIp) {
+    private static void alarmOff(String robotIp, String presenceIp, String chargerIp) {
 
         AlarmDataDescriptor alarmDataDescriptor = new AlarmDataDescriptor();
         AddressDescriptor addressDescriptor = new AddressDescriptor(robotIp, presenceIp, chargerIp);
@@ -235,23 +235,23 @@ public class DataManager {
 
         observingRelationMap = new HashMap<>();
 
-        GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+        getClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
 
         // presence
-        GetClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
+        getClientProcess(coapClient, addressDescriptor.getPresence_monitoring_descriptor(), true, alarmDataDescriptor);
         // charger
-        GetClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
+        getClientProcess(coapClient, addressDescriptor.getCharging_station_descriptor(), true, alarmDataDescriptor);
         // robot
-        GetClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
+        getClientProcess(coapClient, addressDescriptor.getRobot_descriptor(), true, alarmDataDescriptor);
 
         if (!alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getChargerRoom()) || !alarmDataDescriptor.getRobotRoom().equals(alarmDataDescriptor.getPresenceRoom())) {
             logger.error("ERROR. PRESENCE MONITORING OBJECT or CHARGING STATION in different room then ROBOT");
             System.exit(0);
         }
 
-        PutClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
-        PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
-        ObservingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
+        putClientProcess(coapClient, addressDescriptor.getRobot_camera_switch_actuator(), gson.toJson(new MakeCameraSwitchRequest(MakeCameraSwitchRequest.SWITCH_OFF_CAMERA)));
+        putClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_ON_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
+        observingClientProcess(coapClient, addressDescriptor.getRobot_indoor_position_sensor(), true,  observingRelationMap, alarmDataDescriptor);
 
         // cycle with sleep and then cancel registrations
         do {
@@ -275,8 +275,8 @@ public class DataManager {
             value.proactiveCancel();
         });
 
-        PutClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_STOP)));
-        PutClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
+        putClientProcess(coapClient, addressDescriptor.getRobot_mode_actuator(), gson.toJson(new MakeModeRequest(MakeModeRequest.MODE_STOP)));
+        putClientProcess(coapClient, addressDescriptor.getRobot_return_home_actuator(), gson.toJson(new MakeReturnHomeRequest(MakeReturnHomeRequest.SWITCH_OFF_RETURN_HOME, alarmDataDescriptor.getChargerPosition())));
 
         do {
             readAlarmStateFromFile();
@@ -293,7 +293,7 @@ public class DataManager {
         } while (!exit);
     }
 
-    private static void ObservingClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, Map<String, CoapObserveRelation> observingRelationMap, AlarmDataDescriptor alarmDataDescriptor) {
+    private static void observingClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, Map<String, CoapObserveRelation> observingRelationMap, AlarmDataDescriptor alarmDataDescriptor) {
 
         Gson gson = new Gson();
         logger.info("OBSERVING ... {}", targetUrl);
@@ -391,7 +391,7 @@ public class DataManager {
         observingRelationMap.put(targetUrl, relation);
     }
 
-    private static void GetClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, AlarmDataDescriptor alarmDataDescriptor) {
+    private static void getClientProcess(CoapClient coapClient, String targetUrl, boolean useSenml, AlarmDataDescriptor alarmDataDescriptor) {
 
         Gson gson = new Gson();
 
@@ -475,7 +475,7 @@ public class DataManager {
         }
     }
 
-    private static void PutClientProcess(CoapClient coapClient, String targetUrl, String requestPayload) {
+    private static void putClientProcess(CoapClient coapClient, String targetUrl, String requestPayload) {
 
         // request class is a generic CoAP message: in this case we want a PUT.
         // "Message ID", "Token" and other header's fields can be set
