@@ -5,7 +5,7 @@ package it.unimore.fum.iot.exception;
  * @project SMART-HOME-robot-security
  * @created 23/03/2022 - 17:47
  */
-public class ManagerException extends Exception{
+public class ManagerException extends Exception {
 
     public ManagerException(String errorMessage){
         super(errorMessage);
