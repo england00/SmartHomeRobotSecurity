@@ -41,12 +41,9 @@ A Demo IoT Application Use Case emulating a Smart Home system with multiple:
 |     | Component         | Details                                                                                                                     |
 |:----| :----------------| :--------------------------------------------------------------------------------------------------------------------------|
 | ⚙️  | **Architecture**  | <ul><li>Monolithic Java app</li><li>MVC patterns likely</li><li>Text-file based config/data</li><li>Maven project</li></ul> |
-| 🔩  | **Code Quality**  | <ul><li>Maven structure</li><li>Logging via Logback</li><li>Jackson/Gson for JSON</li><li>Strong dependency mgmt</li></ul>  |
 |  🔌 | **Integrations**  | <ul><li>Californium CoAP (IoT comms)</li><li>Logback (logging)</li><li>Gson/Jackson (serialization)</li></ul>               |
 | 🧩  | **Modularity**    | <ul><li>Maven modules</li><li>POJO model separation</li><li>External data: <code>*.txt</code> files</li></ul>               |
-| ⚡️  | **Performance**   | <ul><li>Lightweight deps</li><li>Text-file IO (potential bottleneck)</li><li>Embedded communication</li></ul>               |
 | 📦  | **Dependencies**  | <ul><li>californium-core</li><li>logback-classic</li><li>gson</li><li>jackson-databind</li></ul>                            |
-| 🚀  | **Scalability**   | <ul><li>Single-host design</li><li>Not containerized</li><li>Scaling limited by file-based storage</li></ul>                |
 ```
 
 ---
