@@ -46,6 +46,8 @@ A Demo IoT Application Use Case emulating a Smart Home system with multiple:
 | 📦  | **Dependencies**  | <ul><li>californium-core</li><li>logback-classic</li><li>gson</li><li>jackson-databind</li></ul>                            |
 ```
 
+---
+
 ## 🌅 Project Structure
 
 ```sh
