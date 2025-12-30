@@ -44,13 +44,12 @@ A Demo IoT Application Use Case emulating a Smart Home system with multiple:
 |  🔌 | **Integrations**  | <ul><li>Californium CoAP (IoT comms)</li><li>Logback (logging)</li><li>Gson/Jackson (serialization)</li></ul>               |
 | 🧩  | **Modularity**    | <ul><li>Maven modules</li><li>POJO model separation</li><li>External data: <code>*.txt</code> files</li></ul>               |
 | 📦  | **Dependencies**  | <ul><li>californium-core</li><li>logback-classic</li><li>gson</li><li>jackson-databind</li></ul>                            |
-```
 
 ---
 
 ## 🌅 Project Structure
 
-```sh
+```
 └── SmartHomeRobotSecurity/
     ├── Californium.properties
     ├── docs
