@@ -10,7 +10,7 @@
 <!-- local repository, no metadata badges. -->
 
 <br clear="left"/>
-</div>div>
+</div>
 
 ## ☀️ Table of Contents
 
